@@ -14,11 +14,10 @@ public class Data {
     private final SharedPreferences.Editor writer;
     private final SharedPreferences reader;
     private static Data data = null;
-
     private final Gson gson;
     private final String DATA_NAME = "DATA_NAME";
 
-    Data(Context context) {
+    private Data(Context context) {
         this.gson = new Gson();
         SharedPreferences preferencesWriter = context.getSharedPreferences(DATA_NAME, Context.MODE_PRIVATE);
         this.reader = context.getSharedPreferences(DATA_NAME, Context.MODE_PRIVATE);

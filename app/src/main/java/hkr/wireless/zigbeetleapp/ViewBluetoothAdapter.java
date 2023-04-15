@@ -20,7 +20,7 @@ public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
 
     public ViewBluetoothAdapter(@NonNull Context context, int resource, @NonNull ArrayList<BluetoothDevice> objects) {
         super(context, resource, objects);
-        this.data = new Data(context);
+        this.data = Data.getInstance(context);
         this.resource = resource;
     }
 

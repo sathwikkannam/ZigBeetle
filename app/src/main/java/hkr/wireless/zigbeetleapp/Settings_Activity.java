@@ -3,7 +3,7 @@ package hkr.wireless.zigbeetleapp;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class Settings extends AppCompatActivity {
+public class Settings_Activity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
