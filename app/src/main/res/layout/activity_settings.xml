@@ -34,12 +34,33 @@
         android:background="@drawable/upper_rounded_square"
         android:backgroundTint="@color/black">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekbartext"
+            android:layout_marginTop="100dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:textColor="@color/platinum"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/polling_rate"/>
 
-
-
-
-
-
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:max="100"
+            android:layout_below="@id/seekbartext"
+            android:backgroundTint="@color/platinum"
+            android:foregroundTint="@color/platinum"
+            android:tickMarkTint="@color/platinum"
+            android:progressTint="@color/platinum"
+            android:thumbTint="@color/platinum"
+            android:progress="50"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </RelativeLayout>
 

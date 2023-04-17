@@ -18,11 +18,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.Executors;
-
 
 @RequiresApi(api = Build.VERSION_CODES.S)
 public class Bluetooth_Discovery_Activity extends AppCompatActivity {
@@ -53,22 +53,24 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, PERMISSION_REQUEST_CODE);
         }
 
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                Executors.newSingleThreadExecutor().execute(() -> {
-                    devices = getDevices();
-
-                    runOnUiThread(() ->{
-                        ViewBluetoothAdapter bluetoothAdapter = new ViewBluetoothAdapter(getApplicationContext(), R.layout.item, devices);
-                        listView.setAdapter(bluetoothAdapter);
-                    });
-                });
-                handler.postDelayed(this, 1000);
-            }
-        }, 1000);  //the time is in miliseconds
+        devices = getDevices();
+        ViewBluetoothAdapter bluetoothAdapter = new ViewBluetoothAdapter(getApplicationContext(), R.layout.bluetooth_device_item, devices);
+        listView.setAdapter(bluetoothAdapter);
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                Executors.newSingleThreadExecutor().execute(() -> {
+//                    devices = getDevices();
+//
+//                    runOnUiThread(() ->{
+//                        ViewBluetoothAdapter bluetoothAdapter = new ViewBluetoothAdapter(getApplicationContext(), R.layout.bluetooth_device_item, devices);
+//                        listView.setAdapter(bluetoothAdapter);
+//                    });
+//                });
+//                handler.postDelayed(this, 1000);
+//            }
+//        }, 1000);  //the time is in miliseconds
 
 
 
@@ -80,11 +82,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity {
     private ArrayList<BluetoothDevice> getDevices() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if(!bluetoothAdapter.isEnabled()){
-            startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
-            startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE));
-
-        }
+        //startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
+        startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE));
 
         // PREVIOUS CONNECTED DEVICES.
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
@@ -99,6 +98,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity {
             }
         };
 
+        Toast.makeText(this, "ETER", Toast.LENGTH_SHORT).show();
         return new ArrayList<>(pairedDevices);
     }
 
@@ -112,3 +112,4 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity {
 
 
 }
+

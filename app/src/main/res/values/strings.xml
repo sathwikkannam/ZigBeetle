@@ -53,4 +53,6 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="device_name">Device name</string>
     <string name="mac_address">MAC address</string>
+    <string name="log">log</string>
+    <string name="polling_rate">Polling rate</string>
 </resources>

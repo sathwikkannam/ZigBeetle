@@ -35,7 +35,7 @@
         android:id="@+id/BluetoothDevices"
         android:background="@drawable/upper_rounded_square"
         android:backgroundTint="@color/black"
-        tools:listitem="@layout/item"
+        tools:listitem="@layout/bluetooth_device_item"
         tools:ignore="RtlSymmetry">
     </ListView>
 
