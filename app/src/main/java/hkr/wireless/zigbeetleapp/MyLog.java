@@ -1,6 +1,5 @@
 package hkr.wireless.zigbeetleapp;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -9,17 +8,17 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-public class InputOutputLog {
+public class MyLog {
 
     private LocalDate date;
     private final String log;
     private LocalTime time;
 
-    private final ArrayList<InputOutputLog> logs = new ArrayList<>();
+    private final ArrayList<MyLog> logs = new ArrayList<>();
 
-    private static InputOutputLog inputOutputLog;
+    private static MyLog inputOutputLog;
 
-    private InputOutputLog(String log){
+    private MyLog(String log){
         this.log = log;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -35,11 +34,9 @@ public class InputOutputLog {
         
     }
 
-
-
-    public static InputOutputLog getInstance(String log){
+    public static MyLog getInstance(String log){
         if(inputOutputLog == null){
-            inputOutputLog = new InputOutputLog(log);
+            inputOutputLog = new MyLog(log);
         }
 
         return inputOutputLog;
@@ -63,7 +60,7 @@ public class InputOutputLog {
     public String toString(){
         StringBuilder logs = new StringBuilder();
 
-        for (InputOutputLog log : this.logs) {
+        for (MyLog log : this.logs) {
             logs.append(String.format("%s - %s: %s\n", log.getDate().toString(), log.getTime().toString(), log.getLog()));
         }
 

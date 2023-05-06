@@ -1,13 +1,12 @@
 package hkr.wireless.zigbeetleapp;
 
-import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.google.gson.Gson;
 
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 
 public class Data {
@@ -33,16 +32,39 @@ public class Data {
     }
 
 
-    public void storeToConnect(BluetoothDevice device){
-        this.writer.putString("ToCONNECT", gson.toJson(device)).apply();
-
+    public void storePairedDeviceName(String name){
+        this.writer.putString(StorageKeys.PAIRED_DEVICE_NAME, name).apply();
 
     }
 
-    public BluetoothDevice getToConnect(){
-        @SuppressLint("MissingPermission") Type type = new TypeToken<BluetoothDevice>() {}.getType();
-        return gson.fromJson(this.reader.getString("ToCONNECT", ""), type);
+    public void storePairedDeviceMAC(String mac){
+        this.writer.putString(StorageKeys.PAIRED_DEVICE_MAC, mac).apply();
+
     }
+
+
+    public String getPairedDeviceName(){
+        return this.reader.getString(StorageKeys.PAIRED_DEVICE_NAME, "");
+
+    }
+
+    public String getPairedDeviceMAC(){
+        return this.reader.getString(StorageKeys.PAIRED_DEVICE_MAC, "");
+
+    }
+
+
+    public void storeLogs(ArrayList<MyLog> logs){
+        this.writer.putString(StorageKeys.LOGS_LIST, new Gson().toJson(logs)).apply();
+
+    }
+
+
+    public String getLogs(){
+        Type type = new TypeToken<ArrayList<MyLog>>() {}.getType();
+        return gson.fromJson(this.reader.getString(StorageKeys.LOGS_LIST, ""), type);
+    }
+
 
 
 

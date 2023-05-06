@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.adapters.ViewBluetoothAdapter;
 
@@ -34,12 +35,12 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     private ListView listView;
     public static final int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter bluetoothAdapter;
-    ArrayList<BluetoothDevice> devices;
+    ArrayList<BluetoothDevice> devices = new ArrayList<>();
     private final String TAG = String.valueOf(this);
     private final Activity activity = this;
     private ViewBluetoothAdapter viewBluetoothAdapter;
-    private BluetoothDevice pairedDevice;
-    LinearLayout toHome, toSettings;
+    private LinearLayout toHome, toSettings;
+    Data data;
 
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -48,10 +49,13 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
             Log.d(TAG, "ACTION FOUND");
 
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+
                 BluetoothDevice device = intent.getExtras().getParcelable(BluetoothDevice.EXTRA_DEVICE);
 
-                viewBluetoothAdapter.add(device);
-                viewBluetoothAdapter.notifyDataSetChanged();
+                if(!devices.contains(device)){
+                    viewBluetoothAdapter.add(device);
+                    viewBluetoothAdapter.notifyDataSetChanged();
+                }
 
             }
         }
@@ -66,8 +70,14 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         listView = findViewById(R.id.BluetoothDevices);
         toHome = findViewById(R.id.toHome);
         toSettings = findViewById(R.id.toSettings);
+        data = Data.getInstance(getApplicationContext());
 
+        listView.setOnItemClickListener(this);
         this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.platinum));
+
+        toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class)));
+        toSettings.setOnClickListener(View -> startActivity(new Intent(this, Settings_Activity.class)));
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
@@ -81,10 +91,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ENABLE_BT);
         }
 
-        listView.setOnItemClickListener(this);
-
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        devices = new ArrayList<>(bluetoothAdapter.getBondedDevices());
 
         IntentFilter bondFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         registerReceiver(receiver, bondFilter);
@@ -95,10 +102,6 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         setBluetooth(true);
         setDiscoverability();
         discoverDevices();
-
-
-        toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class).putExtra("device", pairedDevice)));
-        toSettings.setOnClickListener(View -> startActivity(new Intent(this, Settings_Activity.class)));
 
     }
 
@@ -162,13 +165,9 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
 
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
-            bluetoothAdapter.startDiscovery();
         }
 
-        if (!bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.startDiscovery();
-
-        }
+        bluetoothAdapter.startDiscovery();
 
         IntentFilter discoverIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, discoverIntent);
@@ -207,14 +206,19 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_ENABLE_BT);
         }
 
+        BluetoothDevice device = devices.get(i);
         bluetoothAdapter.cancelDiscovery();
-        boolean bonded = devices.get(i).createBond();
+        boolean bonded = device.createBond();
+
+        Toast.makeText(activity, "Connecting to " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
 
         if(bonded){
-            Toast.makeText(activity, "Connecting to : " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
-            pairedDevice = devices.get(i);
+            Toast.makeText(activity, "Connected to " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
+            data.storePairedDeviceName(device.getName());
+            data.storePairedDeviceMAC(device.getAddress());
+
         }else{
-            Toast.makeText(activity, "Failed to connect: " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Failed to connect to " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
         }
 
 

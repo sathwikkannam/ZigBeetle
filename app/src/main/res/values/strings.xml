@@ -59,4 +59,6 @@
     <string name="todo">TODO</string>
     <string name="connectioned">CONNECTIONED:</string>
     <string name="state">State</string>
+    <string name="mac">MAC</string>
+    <string name="connection">Connection</string>
 </resources>
