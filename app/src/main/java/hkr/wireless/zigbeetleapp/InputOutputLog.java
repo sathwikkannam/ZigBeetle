@@ -1,5 +1,6 @@
 package hkr.wireless.zigbeetleapp;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -16,7 +17,9 @@ public class InputOutputLog {
 
     private final ArrayList<InputOutputLog> logs = new ArrayList<>();
 
-    public InputOutputLog(String log){
+    private static InputOutputLog inputOutputLog;
+
+    private InputOutputLog(String log){
         this.log = log;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -25,6 +28,21 @@ public class InputOutputLog {
         }
 
         logs.add(this);
+    }
+
+
+    private void addLog(String log){
+        
+    }
+
+
+
+    public static InputOutputLog getInstance(String log){
+        if(inputOutputLog == null){
+            inputOutputLog = new InputOutputLog(log);
+        }
+
+        return inputOutputLog;
     }
 
     private LocalDate getDate() {

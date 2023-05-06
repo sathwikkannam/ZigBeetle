@@ -39,6 +39,7 @@ public class Connection {
         Executors.newSingleThreadExecutor().execute(() ->{
             try {
                 connectThread.mmSocket.getOutputStream().write(message.getBytes());
+                InputOutputLog.getInstance(String.format("Sent %s", message));
             } catch (IOException e) {
                 Toast.makeText(context, "Error sending data", Toast.LENGTH_SHORT).show();
             }

@@ -55,4 +55,6 @@
     <string name="mac_address">MAC address</string>
     <string name="log">log</string>
     <string name="polling_rate">Polling rate</string>
+    <string name="home">Home</string>
+    <string name="todo">TODO</string>
 </resources>

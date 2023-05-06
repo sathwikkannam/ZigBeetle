@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,6 +11,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
+        android:id="@+id/Header"
         android:layout_height="wrap_content">
 
         <TextView
@@ -22,7 +23,7 @@
             android:layout_height="match_parent"
             android:fontFamily="sans-serif-medium"
             android:text="@string/settings1"
-            android:textSize="77sp"
+            android:textSize="65sp"
             android:textColor="@color/black"/>
     </FrameLayout>
 
@@ -30,6 +31,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="50dp"
+        android:layout_below="@+id/Header"
+        android:layout_above="@+id/Navigation"
         android:id="@+id/FragmentSettings"
         android:background="@drawable/upper_rounded_square"
         android:backgroundTint="@color/black">
@@ -65,4 +68,120 @@
     </RelativeLayout>
 
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:id="@+id/Navigation"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/darkGrey"
+        android:gravity="center">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/toHome"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/home"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_gravity="center"
+                android:background="@drawable/curved_squared"
+                android:backgroundTint="@color/platinum"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:contentDescription="@string/todo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/home"
+                android:layout_gravity="center"
+                android:textColor="@color/platinum"
+                android:textSize="15sp"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/toBluetooth"
+            android:layout_marginStart="70dp"
+            tools:ignore="UseCompoundDrawables">
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/platinum"
+                android:src="@drawable/bluetooth"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_gravity="center"
+                android:background="@drawable/curved_squared"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:contentDescription="@string/todo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bluetooth"
+                android:layout_gravity="center"
+                android:textColor="@color/platinum"
+                android:textSize="15sp"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="70dp"
+            android:id="@+id/toSettings"
+            tools:ignore="UseCompoundDrawables">
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/settings"
+                android:paddingTop="2dp"
+                android:backgroundTint="@color/platinum"
+                android:paddingBottom="2dp"
+                android:layout_gravity="center"
+                android:background="@drawable/curved_squared"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:contentDescription="@string/todo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings1"
+                android:layout_gravity="center"
+                android:textColor="@color/platinum"
+                android:textSize="15sp"/>
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
