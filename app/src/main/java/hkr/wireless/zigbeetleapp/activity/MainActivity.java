@@ -1,4 +1,4 @@
-package hkr.wireless.zigbeetleapp;
+package hkr.wireless.zigbeetleapp.activity;
 
 
 import androidx.annotation.RequiresApi;
@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +13,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import hkr.wireless.zigbeetleapp.R;
+import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
+import hkr.wireless.zigbeetleapp.activity.Settings_Activity;
 
 
 public class MainActivity extends AppCompatActivity {

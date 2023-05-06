@@ -1,4 +1,4 @@
-package hkr.wireless.zigbeetleapp;
+package hkr.wireless.zigbeetleapp.activity;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +25,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import hkr.wireless.zigbeetleapp.R;
+import hkr.wireless.zigbeetleapp.adapters.ViewBluetoothAdapter;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
 public class Bluetooth_Discovery_Activity extends AppCompatActivity implements AdapterView.OnItemClickListener {

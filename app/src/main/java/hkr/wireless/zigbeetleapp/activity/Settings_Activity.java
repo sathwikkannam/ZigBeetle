@@ -1,4 +1,4 @@
-package hkr.wireless.zigbeetleapp;
+package hkr.wireless.zigbeetleapp.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.LinearLayout;
+
+import hkr.wireless.zigbeetleapp.R;
 
 public class Settings_Activity extends AppCompatActivity {
     LinearLayout toHome, toBluetooth;

@@ -1,4 +1,4 @@
-package hkr.wireless.zigbeetleapp;
+package hkr.wireless.zigbeetleapp.adapters;
 
 import android.Manifest;
 import android.app.Activity;
@@ -18,6 +18,9 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
+
+import hkr.wireless.zigbeetleapp.R;
+import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
 
 public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
     private final int resource;
