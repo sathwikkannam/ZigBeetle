@@ -34,12 +34,13 @@
         android:layout_above="@id/Navigation"
         android:layout_marginTop="50dp"
         android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:scrollbars="none"
         android:paddingTop="20dp"
         android:id="@+id/BluetoothDevices"
         android:background="@drawable/upper_rounded_square"
         android:backgroundTint="@color/black"
-        tools:listitem="@layout/bluetooth_device_item"
-        tools:ignore="RtlSymmetry">
+        tools:listitem="@layout/bluetooth_device_item">
     </ListView>
 
 
@@ -53,8 +54,7 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:id="@+id/Navigation"
-
-        android:background="@color/darkGrey"
+        android:background="@color/black"
         android:gravity="center">
 
 
@@ -72,17 +72,18 @@
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
                 android:layout_gravity="center"
-                android:background="@drawable/curved_squared"
                 android:backgroundTint="@color/platinum"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:contentDescription="@string/todo" />
+                android:contentDescription="@string/todo"
+                app:tint="@color/platinum" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/home"
                 android:layout_gravity="center"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/platinum"
                 android:textSize="15sp"/>
 
@@ -116,6 +117,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/bluetooth"
                 android:layout_gravity="center"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/platinum"
                 android:textSize="15sp"/>
 
@@ -139,16 +141,17 @@
                 android:backgroundTint="@color/platinum"
                 android:paddingBottom="2dp"
                 android:layout_gravity="center"
-                android:background="@drawable/curved_squared"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:contentDescription="@string/todo" />
+                android:contentDescription="@string/todo"
+                app:tint="@color/platinum" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/settings1"
                 android:layout_gravity="center"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/platinum"
                 android:textSize="15sp"/>
 

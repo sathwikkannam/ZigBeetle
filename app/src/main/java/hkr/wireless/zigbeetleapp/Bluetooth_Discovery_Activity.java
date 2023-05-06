@@ -35,6 +35,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     private final String TAG = String.valueOf(this);
     private final Activity activity = this;
     private ViewBluetoothAdapter viewBluetoothAdapter;
+    private BluetoothDevice pairedDevice;
     LinearLayout toHome, toSettings;
 
 
@@ -50,33 +51,6 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                 viewBluetoothAdapter.notifyDataSetChanged();
 
             }
-
-            if (action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
-                BluetoothDevice device = intent.getExtras().getParcelable(BluetoothDevice.EXTRA_DEVICE);
-
-                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
-                }
-
-                switch (device.getBondState()) {
-                    case BluetoothDevice.BOND_BONDED: {
-                        Toast.makeText(context, "Already Bonded", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-
-                    case BluetoothDevice.BOND_BONDING: {
-                        Toast.makeText(context, "Already Bonding", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                    case BluetoothDevice.BOND_NONE: {
-                        Toast.makeText(context, "Not bonded yet, ready to bond", Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                }
-
-
-            }
-
         }
     };
 
@@ -120,7 +94,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         discoverDevices();
 
 
-        toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class)));
+        toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class).putExtra("device", pairedDevice)));
         toSettings.setOnClickListener(View -> startActivity(new Intent(this, Settings_Activity.class)));
 
     }
@@ -205,6 +179,14 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         super.onDestroy();
         unregisterReceiver(receiver);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_ENABLE_BT);
+        }
+
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
+
     }
 
 
@@ -226,7 +208,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         boolean bonded = devices.get(i).createBond();
 
         if(bonded){
-            Toast.makeText(activity, "Connected to: " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Connecting to : " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
+            pairedDevice = devices.get(i);
         }else{
             Toast.makeText(activity, "Failed to connect: " + devices.get(i).getName(), Toast.LENGTH_SHORT).show();
         }

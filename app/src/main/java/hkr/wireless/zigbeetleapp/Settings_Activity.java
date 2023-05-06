@@ -1,6 +1,7 @@
 package hkr.wireless.zigbeetleapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Build;
@@ -13,6 +14,8 @@ public class Settings_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.platinum));
 
         toHome = findViewById(R.id.toHome);
         toBluetooth = findViewById(R.id.toBluetooth);

@@ -78,7 +78,7 @@
         android:layout_centerInParent="true"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:background="@color/darkGrey"
+        android:background="@color/black"
         android:gravity="center">
 
 
@@ -96,7 +96,7 @@
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
                 android:layout_gravity="center"
-                android:background="@drawable/curved_squared"
+                app:tint="@color/platinum"
                 android:backgroundTint="@color/platinum"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
@@ -107,6 +107,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/home"
                 android:layout_gravity="center"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/platinum"
                 android:textSize="15sp"/>
 
@@ -130,7 +131,7 @@
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
                 android:layout_gravity="center"
-                android:background="@drawable/curved_squared"
+                app:tint="@color/platinum"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:contentDescription="@string/todo" />
@@ -139,6 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/bluetooth"
+                android:fontFamily="sans-serif-medium"
                 android:layout_gravity="center"
                 android:textColor="@color/platinum"
                 android:textSize="15sp"/>
@@ -173,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/settings1"
                 android:layout_gravity="center"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/platinum"
                 android:textSize="15sp"/>
 
