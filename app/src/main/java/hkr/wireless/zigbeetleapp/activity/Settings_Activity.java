@@ -15,17 +15,23 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
+import hkr.wireless.zigbeetleapp.Utils;
 import hkr.wireless.zigbeetleapp.adapters.LogsAdapter;
+import hkr.wireless.zigbeetleapp.log.LogFormat;
+import hkr.wireless.zigbeetleapp.log.MyLog;
 
 public class Settings_Activity extends AppCompatActivity {
     private LinearLayout toHome, toBluetooth;
     private TextView connectedTo, deviceMac;
     private BluetoothDevice device;
-    private ListView logs;
+    private ListView logsListView;
     public static LogsAdapter logsAdapter;
     private Data data;
+    private ArrayList<LogFormat> storedLogs;
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
@@ -39,10 +45,11 @@ public class Settings_Activity extends AppCompatActivity {
         deviceMac = findViewById(R.id.MAC);
         toHome = findViewById(R.id.toHome);
         toBluetooth = findViewById(R.id.toBluetooth);
-        logs = findViewById(R.id.logs);
+        logsListView = findViewById(R.id.logs);
         device = Bluetooth_Discovery_Activity.pairedDevice;
         data = Data.getInstance(this);
-        logsAdapter =  new LogsAdapter(this, R.layout.log_item, data.getLogs());
+        storedLogs = data.getLogs();
+        logsAdapter =  new LogsAdapter(this, R.layout.log_item, storedLogs);
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -61,14 +68,25 @@ public class Settings_Activity extends AppCompatActivity {
             toBluetooth.setOnClickListener(View -> startActivity(new Intent(this, Bluetooth_Discovery_Activity.class)));
         }
 
-        //logs.setAdapter(logsAdapter);
-        //logs.setFocusable(data.getLogs().size());
+        if(storedLogs != null){
+            if(!storedLogs.isEmpty()){
+                logsListView.setAdapter(logsAdapter);
+                logsListView.setFocusable(storedLogs.size());
+            }
+
+        }
+
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //data.storeLogs(myLog.getLogs());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Utils.replaceLogs(data, storedLogs, MyLog.getInstance().getLogs());
     }
 }

@@ -3,11 +3,11 @@ package hkr.wireless.zigbeetleapp.log;
 import java.util.ArrayList;
 
 public class MyLog {
-    private final ArrayList<LogFormat> logs = new ArrayList<>();
+    private final ArrayList<LogFormat> logs;
     private static MyLog myLog;
 
     private MyLog(){
-
+        this.logs = new ArrayList<>();
     }
 
     public static MyLog getInstance(){

@@ -42,7 +42,7 @@ public class LogsAdapter extends ArrayAdapter<LogFormat> {
         TextView logView = convertView.findViewById(R.id.log);
 
 
-        time.setText(String.format("%s-%s", log.getDate(), log.getTime()));
+        time.setText(String.format("%s-%s | ", log.getDate(), log.getTime()));
         logView.setText(String.format("%s", log.getLog()));
 
 

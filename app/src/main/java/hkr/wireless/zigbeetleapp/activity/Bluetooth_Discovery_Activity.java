@@ -24,21 +24,28 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
+import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
+import hkr.wireless.zigbeetleapp.Utils;
 import hkr.wireless.zigbeetleapp.adapters.ViewBluetoothAdapter;
+import hkr.wireless.zigbeetleapp.log.LogFormat;
+import hkr.wireless.zigbeetleapp.log.MyLog;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
 public class Bluetooth_Discovery_Activity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private ListView listView;
     public static final int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter bluetoothAdapter;
-    private ArrayList<BluetoothDevice> devices = new ArrayList<>();
+    private final ArrayList<BluetoothDevice> devices = new ArrayList<>();
     private final Activity activity = this;
     private ViewBluetoothAdapter viewBluetoothAdapter;
     private LinearLayout toHome, toSettings;
     public static BluetoothDevice pairedDevice;
+    private MyLog myLog;
+    private Data data;
 
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -52,27 +59,6 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                     if (!devices.contains(device)) {
                         viewBluetoothAdapter.add(device);
                         viewBluetoothAdapter.notifyDataSetChanged();
-                    }else {
-                        BluetoothDevice tmp = null;
-
-                        for (BluetoothDevice dev: devices) {
-                            if(dev.getAddress().equals(device.getAddress())){
-                                tmp = dev;
-                                break;
-                            }
-
-                        }
-
-                        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
-                        }
-
-                        if(tmp != null && device.getName() != null && tmp.getName() == null){
-                            devices.remove(tmp);
-                            devices.add(device);
-                            viewBluetoothAdapter.notifyDataSetChanged();
-                        }
-
                     }
 
                     break;
@@ -90,6 +76,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                     switch (device.getBondState()) {
                         case BluetoothDevice.BOND_BONDED: {
                             Toast.makeText(activity, "Connected to " + name, Toast.LENGTH_SHORT).show();
+                            myLog.add(String.format("%s %s", "Connected to", name));
                             pairedDevice = device;
                             break;
                         }
@@ -121,6 +108,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         toHome = findViewById(R.id.toHome);
         toSettings = findViewById(R.id.toSettings);
 
+        myLog = MyLog.getInstance();
+        data = Data.getInstance(this);
         listView.setOnItemClickListener(this);
         this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.platinum));
 
@@ -230,14 +219,25 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         super.onDestroy();
         unregisterReceiver(receiver);
 
+        Toast.makeText(activity, "wtf", Toast.LENGTH_SHORT).show();
+        Utils.replaceLogs(data, data.getLogs(), myLog.getLogs());
+
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_ENABLE_BT);
         }
+
 
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
         }
 
+        Utils.replaceLogs(data, data.getLogs(), myLog.getLogs());
     }
 
 

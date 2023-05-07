@@ -40,9 +40,13 @@ public class Data {
 
     }
 
+    public void clearLogs(){
+        this.writer.remove(StorageKeys.LOGS_LIST).apply();
+    }
+
 
     public ArrayList<LogFormat> getLogs(){
-        Type type = new TypeToken<ArrayList<MyLog>>() {}.getType();
+        Type type = new TypeToken<ArrayList<LogFormat>>() {}.getType();
         return gson.fromJson(this.reader.getString(StorageKeys.LOGS_LIST, ""), type);
     }
 
