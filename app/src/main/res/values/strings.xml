@@ -61,4 +61,6 @@
     <string name="state">State</string>
     <string name="mac">MAC</string>
     <string name="connection">Connection</string>
+    <string name="connected_to_none">Connected to: None</string>
+    <string name="mac1">Mac:</string>
 </resources>

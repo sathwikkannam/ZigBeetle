@@ -32,28 +32,6 @@ public class Data {
     }
 
 
-    public void storePairedDeviceName(String name){
-        this.writer.putString(StorageKeys.PAIRED_DEVICE_NAME, name).apply();
-
-    }
-
-    public void storePairedDeviceMAC(String mac){
-        this.writer.putString(StorageKeys.PAIRED_DEVICE_MAC, mac).apply();
-
-    }
-
-
-    public String getPairedDeviceName(){
-        return this.reader.getString(StorageKeys.PAIRED_DEVICE_NAME, "");
-
-    }
-
-    public String getPairedDeviceMAC(){
-        return this.reader.getString(StorageKeys.PAIRED_DEVICE_MAC, "");
-
-    }
-
-
     public void storeLogs(ArrayList<MyLog> logs){
         this.writer.putString(StorageKeys.LOGS_LIST, new Gson().toJson(logs)).apply();
 
