@@ -8,6 +8,9 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import hkr.wireless.zigbeetleapp.log.LogFormat;
+import hkr.wireless.zigbeetleapp.log.MyLog;
+
 
 public class Data {
     private final SharedPreferences.Editor writer;
@@ -32,13 +35,13 @@ public class Data {
     }
 
 
-    public void storeLogs(ArrayList<MyLog> logs){
+    public void storeLogs(ArrayList<LogFormat> logs){
         this.writer.putString(StorageKeys.LOGS_LIST, new Gson().toJson(logs)).apply();
 
     }
 
 
-    public String getLogs(){
+    public ArrayList<LogFormat> getLogs(){
         Type type = new TypeToken<ArrayList<MyLog>>() {}.getType();
         return gson.fromJson(this.reader.getString(StorageKeys.LOGS_LIST, ""), type);
     }

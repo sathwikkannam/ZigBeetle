@@ -52,7 +52,7 @@ public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, Bluetooth_Discovery_Activity.REQUEST_ENABLE_BT);
         }
 
-        deviceName.setText(device.getName());
+        deviceName.setText((device.getName() == null)? "Unknown Name": device.getName());
         MAC.setText(device.getAddress());
 
         return convertView;

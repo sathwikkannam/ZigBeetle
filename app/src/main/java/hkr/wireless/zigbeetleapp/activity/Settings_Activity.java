@@ -12,14 +12,20 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
+import hkr.wireless.zigbeetleapp.adapters.LogsAdapter;
 
 public class Settings_Activity extends AppCompatActivity {
-    LinearLayout toHome, toBluetooth;
-    TextView connectedTo, deviceMac;
-    BluetoothDevice device;
+    private LinearLayout toHome, toBluetooth;
+    private TextView connectedTo, deviceMac;
+    private BluetoothDevice device;
+    private ListView logs;
+    public static LogsAdapter logsAdapter;
+    private Data data;
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
@@ -33,7 +39,11 @@ public class Settings_Activity extends AppCompatActivity {
         deviceMac = findViewById(R.id.MAC);
         toHome = findViewById(R.id.toHome);
         toBluetooth = findViewById(R.id.toBluetooth);
+        logs = findViewById(R.id.logs);
         device = Bluetooth_Discovery_Activity.pairedDevice;
+        data = Data.getInstance(this);
+        logsAdapter =  new LogsAdapter(this, R.layout.log_item, data.getLogs());
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, Bluetooth_Discovery_Activity.REQUEST_ENABLE_BT);
@@ -51,11 +61,14 @@ public class Settings_Activity extends AppCompatActivity {
             toBluetooth.setOnClickListener(View -> startActivity(new Intent(this, Bluetooth_Discovery_Activity.class)));
         }
 
+        //logs.setAdapter(logsAdapter);
+        //logs.setFocusable(data.getLogs().size());
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //data.storeLogs(myLog.getLogs());
     }
 }

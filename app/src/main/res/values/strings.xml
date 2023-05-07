@@ -63,4 +63,5 @@
     <string name="connection">Connection</string>
     <string name="connected_to_none">Connected to: None</string>
     <string name="mac1">Mac:</string>
+    <string name="time">Time</string>
 </resources>
