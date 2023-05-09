@@ -50,6 +50,15 @@ public class Data {
     }
 
 
+    public void storeUUID(String uuid){
+        this.writer.putString(StorageKeys.WORKING_UUID, uuid).apply();
+    }
+
+    public String getUUID(){
+        return this.reader.getString(StorageKeys.WORKING_UUID, "");
+    }
+
+
 
 
 

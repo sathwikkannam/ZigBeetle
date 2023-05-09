@@ -58,6 +58,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                     if (!devices.contains(device)) {
                         viewBluetoothAdapter.add(device);
                         viewBluetoothAdapter.notifyDataSetChanged();
+                        listView.setSelection(devices.size() - 1);
                     }
 
                     break;
@@ -74,11 +75,11 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
 
                     switch (device.getBondState()) {
                         case BluetoothDevice.BOND_BONDED: {
-                            Toast.makeText(activity, "Paired/Bonded to " + name, Toast.LENGTH_SHORT).show();
-                            myLog.add(String.format("%s %s", "Paired/Bonded to", name));
+                            Toast.makeText(activity, "Paired to " + name, Toast.LENGTH_SHORT).show();
+                            myLog.add(String.format("%s %s", "Paired to", name));
                             pairedDevice = device;
-                            bluetoothService = BluetoothService.getInstance(activity, device);
-                            bluetoothService.connect();
+                            bluetoothService = BluetoothService.getInstance(activity);
+                            bluetoothService.connect(device);
                             break;
                         }
                         case BluetoothDevice.BOND_BONDING: {
@@ -89,6 +90,9 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                             Toast.makeText(activity, "Can't bond to " + name, Toast.LENGTH_SHORT).show();
                             break;
                         }
+                        default:
+                            Toast.makeText(activity, "Already bonded to " + name, Toast.LENGTH_SHORT).show();
+                            break;
 
 
                     }
@@ -113,7 +117,6 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         data = Data.getInstance(this);
         listView.setOnItemClickListener(this);
         this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.platinum));
-
 
         toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class).putExtra(StorageKeys.DEVICE_FROM_BLUETOOTH_ACTIVITY, pairedDevice)));
         toSettings.setOnClickListener(View -> startActivity(new Intent(this, Settings_Activity.class)));
@@ -264,5 +267,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         devices.get(i).createBond();
 
     }
+
+
 }
 

@@ -18,107 +18,66 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import hkr.wireless.zigbeetleapp.log.MyLog;
 
-public class BluetoothService {
+public class BluetoothService{
     private final BluetoothAdapter adapter;
     private BluetoothSocket bluetoothSocket;
-    private final BluetoothDevice bluetoothDevice;
     private InputStream receivingStream;
     private OutputStream sendingStream;
-    // Standard SPP profile.
-    private final UUID uuid = UUID.fromString("0000111f-0000-1000-8000-00805f9b34fb");
-    private final String serviceName = "ZIGBEEAPP";
+    private UUID uuid;
+    private final UUID SPP_PROFILE_UUID  = UUID.fromString("0000111f-0000-1000-8000-00805f9b34fb");
     private final Activity activity;
     private final int REQUEST_ENABLE_BT = 1;
-    private final String name;
+    private String name;
     private final MyLog log;
     public static BluetoothService bluetoothService;
+    private final Data data;
 
     @RequiresApi(api = Build.VERSION_CODES.S)
-    private BluetoothService(Activity activity, BluetoothDevice device) {
-        this.bluetoothDevice = device;
+    private BluetoothService(Activity activity) {
         this.adapter = BluetoothAdapter.getDefaultAdapter();
         this.activity = activity;
         this.log = MyLog.getInstance();
-
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
-        }
-
-        this.name = (bluetoothDevice.getName() == null || bluetoothDevice.getName().equals(""))? bluetoothDevice.getAddress() : bluetoothDevice.getName();
+        this.data = Data.getInstance(activity);
     }
 
 
-    public static BluetoothService getInstance(Activity activity, BluetoothDevice device){
+    public static BluetoothService getInstance(Activity activity){
         if(bluetoothService == null){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                bluetoothService = new BluetoothService(activity, device);
+                bluetoothService = new BluetoothService(activity);
             }
         }
         return bluetoothService;
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    public void connect() {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
-        }
-        adapter.cancelDiscovery();
-
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                bluetoothSocket = this.bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-                bluetoothSocket.connect();
-                createStreams();
-
-            } catch (
-                    IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            activity.runOnUiThread(() ->{
-                if(bluetoothSocket.isConnected()){
-                    Toast.makeText(activity, "Connected to " + name, Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(activity, "Error connecting to " + name, Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        });
-    }
-
     private void createStreams(){
-        if(bluetoothSocket.isConnected()){
+        if(this.bluetoothSocket.isConnected()){
             try {
-                receivingStream = bluetoothSocket.getInputStream();
-                sendingStream = bluetoothSocket.getOutputStream();
+                this.receivingStream = bluetoothSocket.getInputStream();
+                this.sendingStream = bluetoothSocket.getOutputStream();
             } catch (IOException e) {
-                activity.runOnUiThread(() ->{
-                    Toast.makeText(activity, "Error with getting streams", Toast.LENGTH_SHORT).show();
-                });
+                activity.runOnUiThread(() -> Toast.makeText(activity, "Error with getting streams", Toast.LENGTH_SHORT).show());
             }
         }
     }
 
 
     public void send(byte[] msg){
-
-        if(sendingStream != null){
-
+        if(this.sendingStream != null){
             Executors.newSingleThreadExecutor().execute(() ->{
                 try {
-                    sendingStream.write(msg);
+                    this.sendingStream.write(msg);
                     log.add(String.format("%s %s %s %s", "Sent", new String(msg), "to", name));
-
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "Sent message", Toast.LENGTH_SHORT).show());
                 } catch (IOException e) {
-                    activity.runOnUiThread(() -> Toast.makeText(activity, "Error sending message" + name, Toast.LENGTH_SHORT).show());
+                    e.printStackTrace();
+                    activity.runOnUiThread(() -> Toast.makeText(activity, "ERROR", Toast.LENGTH_SHORT).show());
 
                 }
 
@@ -131,11 +90,11 @@ public class BluetoothService {
     public byte[] read(){
         byte[] response = new byte[1024];
 
-        if(receivingStream != null){
+        if(this.receivingStream != null){
 
             Executors.newSingleThreadExecutor().execute(() ->{
                 try {
-                    receivingStream.read(response);
+                    this.receivingStream.read(response);
 
                     if(!new String(response).equals("")){
                         log.add(String.format("%s %s %s %s", "Received", new String(response), "from", name));
@@ -151,17 +110,93 @@ public class BluetoothService {
     }
 
 
-    private ArrayList<ParcelUuid> getUUIDs() {
-        ParcelUuid[] uuids = new ParcelUuid[0];
+    private ParcelUuid[] getUUIDs() {
+        ParcelUuid[] uuids =  new ParcelUuid[0];
         try {
-            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
             Method getUuidsMethod = BluetoothAdapter.class.getDeclaredMethod("getUuids", null);
-            uuids = (ParcelUuid[]) getUuidsMethod.invoke(adapter, null);
+            uuids =  (ParcelUuid[]) getUuidsMethod.invoke(this.adapter, null);
 
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return (ArrayList<ParcelUuid>) Arrays.asList(uuids);
+
+        return uuids;
     }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    public void connect(BluetoothDevice device){
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
+        }
+
+        this.name = (device.getName() == null || device.getName().equals(""))? device.getAddress() : device.getName();
+
+
+        adapter.cancelDiscovery();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try{
+                UUID storedUUID = UUID.fromString(data.getUUID());
+                connectSocket(device, storedUUID);
+            }catch (IllegalArgumentException | NullPointerException | IOException e){
+                tryUUIDS(device);
+            }
+
+
+            if(bluetoothSocket == null || !bluetoothSocket.isConnected()){
+                activity.runOnUiThread(() -> Toast.makeText(activity, "Can't Connect to " + name, Toast.LENGTH_SHORT).show());
+                return;
+            }
+
+            if(bluetoothSocket.isConnected()){
+                //createStreams();
+                if(this.uuid != null){
+                    data.storeUUID(this.uuid.toString());
+                }
+
+                activity.runOnUiThread(() -> Toast.makeText(activity, "Connected to " + name, Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+
+    private void tryUUIDS(BluetoothDevice device){
+        ParcelUuid[] uuids = getUUIDs();
+
+        for (ParcelUuid uuid : uuids){
+            try{
+                if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)) {
+                    connectSocket(device, uuid.getUuid());
+                }
+
+                if(bluetoothSocket != null && !bluetoothSocket.isConnected()){
+                    this.uuid = uuid.getUuid(); // NEW CHANGE
+                    return;
+                }
+            }catch(IOException | NullPointerException e ){
+                continue;
+            }
+        }
+
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private void connectSocket(BluetoothDevice device, UUID uuid) throws  IOException{
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
+        }
+
+        this.bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
+        this.bluetoothSocket.connect();
+        createStreams();
+
+    }
+
+
+    public boolean isConnected(){
+        return (this.bluetoothSocket == null)? false : this.bluetoothSocket.isConnected();
+    }
+
 
 }

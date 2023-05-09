@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Data;
@@ -52,18 +53,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         data = Data.getInstance(this);
+        bluetoothService = BluetoothService.getInstance(this);
         //Data.getInstance(this).clearLogs();
         toBluetooth = findViewById(R.id.toBluetooth);
         toSettings = findViewById(R.id.toSettings);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            dev = getIntent().getParcelableExtra(StorageKeys.DEVICE_FROM_BLUETOOTH_ACTIVITY, BluetoothDevice.class);
-        }
-
-        if(dev != null){
-            bluetoothService = BluetoothService.getInstance(this, dev);
-        }
-
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            dev = getIntent().getParcelableExtra(StorageKeys.DEVICE_FROM_BLUETOOTH_ACTIVITY, BluetoothDevice.class);
+//        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             toBluetooth.setOnClickListener(View -> startActivity(new Intent(this, Bluetooth_Discovery_Activity.class)));
@@ -82,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void sendMessage(String msg){
-        bluetoothService.send(msg.getBytes());
+        if(bluetoothService.isConnected()){
+            bluetoothService.send(msg.getBytes());
+        }
     }
 
 
