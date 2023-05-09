@@ -19,7 +19,6 @@ import java.util.ArrayList;
 
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
-import hkr.wireless.zigbeetleapp.Utils;
 import hkr.wireless.zigbeetleapp.adapters.LogsAdapter;
 import hkr.wireless.zigbeetleapp.log.LogFormat;
 import hkr.wireless.zigbeetleapp.log.MyLog;
@@ -71,7 +70,6 @@ public class Settings_Activity extends AppCompatActivity {
         if(storedLogs != null){
             if(!storedLogs.isEmpty()){
                 logsListView.setAdapter(logsAdapter);
-                logsListView.setFocusable(storedLogs.size());
             }
 
         }
@@ -87,6 +85,6 @@ public class Settings_Activity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        Utils.replaceLogs(data, storedLogs, MyLog.getInstance().getLogs());
+       // NEEW.replaceLogs(data, storedLogs, MyLog.getInstance().getLogs());
     }
 }

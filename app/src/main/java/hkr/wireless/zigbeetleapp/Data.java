@@ -1,5 +1,6 @@
 package hkr.wireless.zigbeetleapp;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.google.gson.Gson;
@@ -39,16 +40,15 @@ public class Data {
         this.writer.putString(StorageKeys.LOGS_LIST, new Gson().toJson(logs)).apply();
 
     }
-
     public void clearLogs(){
         this.writer.remove(StorageKeys.LOGS_LIST).apply();
     }
-
 
     public ArrayList<LogFormat> getLogs(){
         Type type = new TypeToken<ArrayList<LogFormat>>() {}.getType();
         return gson.fromJson(this.reader.getString(StorageKeys.LOGS_LIST, ""), type);
     }
+
 
 
 

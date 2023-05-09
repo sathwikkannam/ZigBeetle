@@ -2,8 +2,8 @@ package hkr.wireless.zigbeetleapp;
 
 public class StorageKeys {
 
-    static final String PAIRED_DEVICE_NAME = "DEVICE_NAME";
-    static final String PAIRED_DEVICE_MAC = "DEVICE_MAC";
+    public static final String STORE_BLUETOOTH_DEVICE = "STORE_BLUETOOTH_DEVICE";
+    public static final String DEVICE_FROM_BLUETOOTH_ACTIVITY = "Device";
     static final String LOGS_LIST = "LOGS";
 
 }

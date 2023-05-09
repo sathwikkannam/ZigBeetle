@@ -24,14 +24,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
 
+import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
-import hkr.wireless.zigbeetleapp.Utils;
+import hkr.wireless.zigbeetleapp.StorageKeys;
 import hkr.wireless.zigbeetleapp.adapters.ViewBluetoothAdapter;
-import hkr.wireless.zigbeetleapp.log.LogFormat;
 import hkr.wireless.zigbeetleapp.log.MyLog;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
@@ -43,9 +41,10 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     private final Activity activity = this;
     private ViewBluetoothAdapter viewBluetoothAdapter;
     private LinearLayout toHome, toSettings;
-    public static BluetoothDevice pairedDevice;
+    public static BluetoothDevice pairedDevice = null;
     private MyLog myLog;
     private Data data;
+    BluetoothService bluetoothService;
 
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -75,17 +74,19 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
 
                     switch (device.getBondState()) {
                         case BluetoothDevice.BOND_BONDED: {
-                            Toast.makeText(activity, "Connected to " + name, Toast.LENGTH_SHORT).show();
-                            myLog.add(String.format("%s %s", "Connected to", name));
+                            Toast.makeText(activity, "Paired/Bonded to " + name, Toast.LENGTH_SHORT).show();
+                            myLog.add(String.format("%s %s", "Paired/Bonded to", name));
                             pairedDevice = device;
+                            bluetoothService = BluetoothService.getInstance(activity, device);
+                            bluetoothService.connect();
                             break;
                         }
                         case BluetoothDevice.BOND_BONDING: {
-                            Toast.makeText(activity, "Connecting to " + name, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Bonding to " + name, Toast.LENGTH_SHORT).show();
                             break;
                         }
                         case BluetoothDevice.BOND_NONE: {
-                            Toast.makeText(activity, "Couldn't connect to " + name, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Can't bond to " + name, Toast.LENGTH_SHORT).show();
                             break;
                         }
 
@@ -113,7 +114,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         listView.setOnItemClickListener(this);
         this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.platinum));
 
-        toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class)));
+
+        toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class).putExtra(StorageKeys.DEVICE_FROM_BLUETOOTH_ACTIVITY, pairedDevice)));
         toSettings.setOnClickListener(View -> startActivity(new Intent(this, Settings_Activity.class)));
 
 
@@ -178,18 +180,22 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
      * Makes the devices discoverable.
      */
     public void setDiscoverability() {
-
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_ADVERTISE}, REQUEST_ENABLE_BT);
         }
 
-        startActivity(discoverableIntent);
+        if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
 
-        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        registerReceiver(receiver, intentFilter);
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+
+
+            IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+            registerReceiver(receiver, intentFilter);
+
+            startActivity(discoverableIntent);
+
+        }
 
     }
 
@@ -219,8 +225,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         super.onDestroy();
         unregisterReceiver(receiver);
 
-        Toast.makeText(activity, "wtf", Toast.LENGTH_SHORT).show();
-        Utils.replaceLogs(data, data.getLogs(), myLog.getLogs());
+        //NEEW.replaceLogs(data, data.getLogs(), myLog.getLogs());
 
 
     }
@@ -237,7 +242,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
             bluetoothAdapter.cancelDiscovery();
         }
 
-        Utils.replaceLogs(data, data.getLogs(), myLog.getLogs());
+        //unregisterReceiver(receiver);
+        //Utils.replaceLogs(data, data.getLogs(), myLog.getLogs());
     }
 
 

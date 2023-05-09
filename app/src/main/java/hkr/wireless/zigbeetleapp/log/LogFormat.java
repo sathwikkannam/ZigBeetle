@@ -2,6 +2,8 @@ package hkr.wireless.zigbeetleapp.log;
 
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -33,5 +35,12 @@ public class LogFormat {
 
     public String getTime() {
         return time;
+    }
+
+
+    @NonNull
+    @Override
+    public String toString(){
+        return String.format("%s %s | %s", getDate(), getTime(), getLog());
     }
 }
