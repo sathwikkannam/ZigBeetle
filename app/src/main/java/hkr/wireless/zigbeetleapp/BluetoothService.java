@@ -110,22 +110,13 @@ public class BluetoothService{
     }
 
 
-    private ParcelUuid[] getUUIDs() {
-        ParcelUuid[] uuids =  new ParcelUuid[0];
-        try {
-            Method getUuidsMethod = BluetoothAdapter.class.getDeclaredMethod("getUuids", null);
-            uuids =  (ParcelUuid[]) getUuidsMethod.invoke(this.adapter, null);
-
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return uuids;
-    }
-
-
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void connect(BluetoothDevice device){
+        if(this.isConnected() && this.bluetoothSocket.getRemoteDevice() == device){
+            return;
+        }
+
+
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
         }
@@ -144,7 +135,7 @@ public class BluetoothService{
             }
 
 
-            if(bluetoothSocket == null || !bluetoothSocket.isConnected()){
+            if(!this.isConnected()){
                 activity.runOnUiThread(() -> Toast.makeText(activity, "Can't Connect to " + name, Toast.LENGTH_SHORT).show());
                 return;
             }
@@ -161,16 +152,16 @@ public class BluetoothService{
     }
 
     private void tryUUIDS(BluetoothDevice device){
-        ParcelUuid[] uuids = getUUIDs();
+        UUID[] uuids = getUUIDs();
 
-        for (ParcelUuid uuid : uuids){
+        for (UUID uuid : uuids){
             try{
                 if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)) {
-                    connectSocket(device, uuid.getUuid());
+                    connectSocket(device, uuid);
                 }
 
                 if(bluetoothSocket != null && !bluetoothSocket.isConnected()){
-                    this.uuid = uuid.getUuid(); // NEW CHANGE
+                    this.uuid = uuid; // NEW CHANGE
                     return;
                 }
             }catch(IOException | NullPointerException e ){
@@ -196,6 +187,31 @@ public class BluetoothService{
 
     public boolean isConnected(){
         return (this.bluetoothSocket == null)? false : this.bluetoothSocket.isConnected();
+    }
+
+
+    private UUID[] getUUIDs() {
+        ParcelUuid[] parcelUuids = new ParcelUuid[0];
+        UUID[] uuids = new UUID[0];
+
+        try {
+            Method getUuidsMethod = BluetoothAdapter.class.getDeclaredMethod("getUuids", null);
+            parcelUuids = (ParcelUuid[]) getUuidsMethod.invoke(this.adapter, null);
+
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        if (parcelUuids != null) {
+            uuids = new UUID[parcelUuids.length + 1];
+            uuids[0] = this.SPP_PROFILE_UUID;
+
+            for (int i = 0; i < parcelUuids.length; i++) {
+                uuids[i + 1] = parcelUuids[i].getUuid();
+            }
+        }
+
+        return uuids;
     }
 
 
