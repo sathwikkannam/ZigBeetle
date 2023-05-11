@@ -1,6 +1,5 @@
 package hkr.wireless.zigbeetleapp;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.google.gson.Gson;
@@ -10,7 +9,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import hkr.wireless.zigbeetleapp.log.LogFormat;
-import hkr.wireless.zigbeetleapp.log.MyLog;
 
 
 public class Data {
@@ -37,25 +35,25 @@ public class Data {
 
 
     public void storeLogs(ArrayList<LogFormat> logs){
-        this.writer.putString(StorageKeys.LOGS_LIST, new Gson().toJson(logs)).apply();
+        this.writer.putString(Constants.LOGS_LIST, new Gson().toJson(logs)).apply();
 
     }
     public void clearLogs(){
-        this.writer.remove(StorageKeys.LOGS_LIST).apply();
+        this.writer.remove(Constants.LOGS_LIST).apply();
     }
 
     public ArrayList<LogFormat> getLogs(){
         Type type = new TypeToken<ArrayList<LogFormat>>() {}.getType();
-        return gson.fromJson(this.reader.getString(StorageKeys.LOGS_LIST, ""), type);
+        return gson.fromJson(this.reader.getString(Constants.LOGS_LIST, ""), type);
     }
 
 
     public void storeUUID(String uuid){
-        this.writer.putString(StorageKeys.WORKING_UUID, uuid).apply();
+        this.writer.putString(Constants.WORKING_UUID, uuid).apply();
     }
 
     public String getUUID(){
-        return this.reader.getString(StorageKeys.WORKING_UUID, "");
+        return this.reader.getString(Constants.WORKING_UUID, "");
     }
 
 

@@ -1,6 +1,6 @@
 package hkr.wireless.zigbeetleapp;
 
-public class StorageKeys {
+public class Constants {
 
     public static final String STORE_BLUETOOTH_DEVICE = "STORE_BLUETOOTH_DEVICE";
     public static final String DEVICE_FROM_BLUETOOTH_ACTIVITY = "Device";
