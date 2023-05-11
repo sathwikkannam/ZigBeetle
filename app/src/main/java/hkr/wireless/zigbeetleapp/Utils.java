@@ -24,11 +24,9 @@ public class Utils {
     public static String getName(BluetoothDevice device) {
         String deviceName = device.getName();
         String deviceMac = device.getAddress();
-        String myAlias = null;
+        String myAlias;
 
-        if(myDevices != null){
-            myAlias = myDevices.get(deviceMac);
-        }
+        myAlias = myDevices.get(deviceMac);
 
         if(myAlias != null){
             return myAlias;

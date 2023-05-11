@@ -19,6 +19,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
+import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.Sensor;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private SensorAdapter sensorAdapter;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice zigbeeController;
-    public static final String zigbeeControllerMac = null;
+    public static final String zigbeeControllerMac = Constants.zigbeeControllerMac;
     private TextView deviceConnectedTO;
 
     Data data;
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void connectToZigbeeController(){
-        deviceConnectedTO.setText("Connecting...");
+        deviceConnectedTO.setText(R.string.connecting);
         deviceConnectedTO.setTextColor(ContextCompat.getColor(this, R.color.platinum));
 
         zigbeeController = bluetoothAdapter.getRemoteDevice(zigbeeControllerMac);

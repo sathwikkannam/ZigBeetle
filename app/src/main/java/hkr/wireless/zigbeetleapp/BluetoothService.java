@@ -36,8 +36,13 @@ public class BluetoothService{
     private final UUID SPP_PROFILE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private final Data data;
     public final int SPP_MODE = 1;
-    public final int NORMAL_MODE = 0;
+    public final int ALL_UUIDS = 0;
 
+
+    /**
+     * Constructor
+     * @param activity Activity
+     */
     @RequiresApi(api = Build.VERSION_CODES.S)
     private BluetoothService(Activity activity) {
         this.adapter = BluetoothAdapter.getDefaultAdapter();
@@ -47,6 +52,12 @@ public class BluetoothService{
     }
 
 
+    /**
+     * BluetoothService is a Singleton Object, so I can interact with the connected device from any
+     * Activity.
+     * @param activity Activity for sending Toasts.
+     * @return BluetoothService object
+     */
     public static BluetoothService getInstance(Activity activity){
         if(bluetoothService == null){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -57,18 +68,24 @@ public class BluetoothService{
     }
 
 
+    /**
+     * Creates Input and Output stream if the connection to the remote device is successful.
+     */
     private void createStreams(){
         if(this.isConnected()){
             try {
                 this.receivingStream = bluetoothSocket.getInputStream();
                 this.sendingStream = bluetoothSocket.getOutputStream();
             } catch (IOException e) {
-                activity.runOnUiThread(() -> Toast.makeText(activity, "Error with getting streams", Toast.LENGTH_SHORT).show());
+                sendToast("Error creating Streams");
             }
         }
     }
 
 
+    /**
+     * @param msg A send message to send to the remote device.
+     */
     public void send(byte[] msg){
         if(this.sendingStream == null || !this.isConnected()){
             return;
@@ -79,10 +96,10 @@ public class BluetoothService{
             try {
                 this.sendingStream.write(msg);
                 log.add(String.format("%s %s %s %s", "Sent", new String(msg), "to", Utils.getName(this.bluetoothSocket.getRemoteDevice())));
-                activity.runOnUiThread(() -> Toast.makeText(activity, "Sent message", Toast.LENGTH_SHORT).show());
+                sendToast("Sent message");
             } catch (IOException e) {
                 e.printStackTrace();
-                activity.runOnUiThread(() -> Toast.makeText(activity, "ERROR", Toast.LENGTH_SHORT).show());
+                sendToast("Error sending message");
 
             }
 
@@ -90,6 +107,9 @@ public class BluetoothService{
     }
 
 
+    /**
+     * @return Received Data
+     */
     public byte[] read(){
         if(this.receivingStream == null || !this.isConnected()){
             return null;
@@ -106,7 +126,7 @@ public class BluetoothService{
                 }
 
             } catch (IOException e) {
-                activity.runOnUiThread(() -> Toast.makeText(activity, "Error receiving data", Toast.LENGTH_SHORT).show());
+                sendToast("Error receiving data");
             }
         });
 
@@ -114,25 +134,38 @@ public class BluetoothService{
     }
 
 
+    /**
+     * This attempts to connect to the remote bluetooth device with either only SPP profile or
+     * try's all UUIDs until a connection is made.
+     *
+     * @param device A bluetoothDevice to connect to.
+     * @param mode Either only SPP profile or all UUID's
+     */
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void connect(BluetoothDevice device, int mode){
-        if((this.isConnected() && this.bluetoothSocket.getRemoteDevice() == device) || device == null){
+        if(device == null){
             return;
         }
+
+        close();
 
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
         }
 
         adapter.cancelDiscovery();
+        String name = Utils.getName(device);
+        sendToast("Connecting to " + name);
 
 
         if(mode == this.SPP_MODE){
             try{
-                this.connectSocket(device, SPP_PROFILE);
+                this.connectSocket(device, this.SPP_PROFILE);
+                sendToast("Connected to " + name);
                 return;
             }catch (IOException e){
                 e.printStackTrace();
+                sendToast("Error connecting with SPP Profile");
             }
         }
 
@@ -141,31 +174,37 @@ public class BluetoothService{
         Executors.newSingleThreadExecutor().execute(() -> {
             for (UUID uuid : uuids){
                 try{
-
                     connectSocket(device, uuid);
-
+                    break;
                 }catch(IOException | NullPointerException f){
                     f.printStackTrace();
                 }
             }
 
-
-            if(!this.isConnected()){
-                activity.runOnUiThread(() -> Toast.makeText(activity, "Can't Connect to " + Utils.getName(device), Toast.LENGTH_SHORT).show());
-                return;
+            if(this.isConnected()){
+                this.sendToast("Connected to " + name);
+                log.add(String.format("%s %s", "Connected to", name));
+            }else{
+                this.sendToast("Can't connect to " + name);
             }
-            activity.runOnUiThread(() -> Toast.makeText(activity, "Connected to " + Utils.getName(device), Toast.LENGTH_SHORT).show());
 
         });
+
     }
 
 
+    /**
+     * @param device A bluetoothDevice to connect to.
+     * @param uuid This is either device's UUID or SSP profile.
+     * @throws IOException If the socket is not connected.
+     */
     @RequiresApi(api = Build.VERSION_CODES.S)
     private void connectSocket(BluetoothDevice device, UUID uuid) throws  IOException{
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
         }
 
+        this.close();
         this.bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
         this.bluetoothSocket.connect();
         createStreams();
@@ -173,15 +212,25 @@ public class BluetoothService{
     }
 
 
+    /**
+     * @return If the bluetooth is connected.
+     */
     public boolean isConnected(){
-        return (this.bluetoothSocket == null)? false : this.bluetoothSocket.isConnected();
+        return this.bluetoothSocket != null && this.bluetoothSocket.isConnected();
     }
 
+
+    /**
+     * @return The bluetooth socket's connected device.
+     */
     public BluetoothDevice getRemoteDevice(){
         return (this.bluetoothSocket == null)? null : this.bluetoothSocket.getRemoteDevice();
     }
 
 
+    /**
+     * @return A list containing device's UUIDs.
+     */
     private ArrayList<UUID> getDeviceUUIDS() {
         ParcelUuid[] parcelUuids = new ParcelUuid[0];
         ArrayList<UUID> uuids = new ArrayList<>();
@@ -199,17 +248,31 @@ public class BluetoothService{
                 uuids.add(parcelUuid.getUuid());
             }
         }
+        uuids.add(this.SPP_PROFILE);
 
         return uuids;
     }
 
 
+    /**
+     * Closing the bluetooth socket.
+     */
     public void close(){
-        try{
-            bluetoothSocket.close();
-        }catch (IOException | NullPointerException e){
-            e.printStackTrace();
+        if(this.isConnected()){
+            try{
+                this.bluetoothSocket.close();
+            }catch (IOException | NullPointerException e){
+                e.printStackTrace();
+            }
         }
+    }
+
+    /**
+     * Send a toast that is run on UI thread.
+     * @param msg Message to toast.
+     */
+    private void sendToast(String msg){
+        this.activity.runOnUiThread(() -> Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show());
     }
 
 
