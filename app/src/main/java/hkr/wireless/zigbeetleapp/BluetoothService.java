@@ -91,7 +91,7 @@ public class BluetoothService{
 
 
     public byte[] read(){
-        if(this.receivingStream == null || this.isConnected()){
+        if(this.receivingStream == null || !this.isConnected()){
             return null;
         }
 
