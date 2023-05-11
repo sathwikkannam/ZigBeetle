@@ -37,6 +37,7 @@ public class BluetoothService{
     private final Data data;
     public final int SPP_MODE = 1;
     public final int ALL_UUIDS = 0;
+    private final ArrayList<UUID> deviceUUIDS;
 
 
     /**
@@ -49,6 +50,7 @@ public class BluetoothService{
         this.activity = activity;
         this.log = MyLog.getInstance();
         this.data = Data.getInstance(activity);
+        this.deviceUUIDS = this.getDeviceUUIDS();
     }
 
 
@@ -169,10 +171,9 @@ public class BluetoothService{
             }
         }
 
-        ArrayList<UUID> uuids = this.getDeviceUUIDS();
-
+        
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (UUID uuid : uuids){
+            for (UUID uuid : this.deviceUUIDS){
                 try{
                     connectSocket(device, uuid);
                     break;
