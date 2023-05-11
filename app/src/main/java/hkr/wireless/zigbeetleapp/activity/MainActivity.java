@@ -4,31 +4,42 @@ package hkr.wireless.zigbeetleapp.activity;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
-import hkr.wireless.zigbeetleapp.StorageKeys;
+import hkr.wireless.zigbeetleapp.Sensor;
+import hkr.wireless.zigbeetleapp.Utils;
+import hkr.wireless.zigbeetleapp.adapters.SensorAdapter;
 
 
 public class MainActivity extends AppCompatActivity {
-    LinearLayout toBluetooth, toSettings;
-    BluetoothDevice dev = null;
-    BluetoothService bluetoothService;
+    private LinearLayout toBluetooth, toSettings;
+    private BluetoothService bluetoothService;
+    private ListView listView;
+    private ArrayList<Sensor> sensors;
+    private SensorAdapter sensorAdapter;
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothDevice zigbeeController;
+    public static final String zigbeeControllerMac = null;
+    private TextView deviceConnectedTO;
 
     Data data;
     int REQUEST_ENABLE_BT = 1;
-    @SuppressLint("MissingPermission")
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,19 +65,29 @@ public class MainActivity extends AppCompatActivity {
 
         data = Data.getInstance(this);
         bluetoothService = BluetoothService.getInstance(this);
-        //Data.getInstance(this).clearLogs();
         toBluetooth = findViewById(R.id.toBluetooth);
+        listView = findViewById(R.id.sensors_listview);
         toSettings = findViewById(R.id.toSettings);
+        deviceConnectedTO = findViewById(R.id.connected_device);
+        sensors = createSensors();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            dev = getIntent().getParcelableExtra(StorageKeys.DEVICE_FROM_BLUETOOTH_ACTIVITY, BluetoothDevice.class);
-//        }
+        Data.getInstance(this).clearLogs();
+        sensorAdapter = new SensorAdapter(this, bluetoothService, R.layout.sensor_item, sensors);
+        listView.setAdapter(sensorAdapter);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            toBluetooth.setOnClickListener(View -> startActivity(new Intent(this, Bluetooth_Discovery_Activity.class)));
+
+        toSettings.setOnClickListener(View -> Utils.startActivity(this, Settings_Activity.class));
+        toBluetooth.setOnClickListener(View -> Utils.startActivity(this, Bluetooth_Discovery_Activity.class));
+
+        if(!bluetoothService.isConnected() && zigbeeControllerMac != null){
+            connectToZigbeeController();
+
+        }else if(bluetoothService.isConnected()){
+            deviceConnectedTO.setText(String.format("%s %s", "Connected to", Utils.getName(bluetoothService.getRemoteDevice())));
+            deviceConnectedTO.setTextColor(ContextCompat.getColor(this, R.color.green));
+
         }
-
-        toSettings.setOnClickListener(View -> startActivity(new Intent(this, Settings_Activity.class)));
 
     }
 
@@ -74,18 +95,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        //NEEW.replaceLogs(data, data.getLogs(), MyLog.getInstance().getLogs());
+        bluetoothService.close();
+        //Utils.replaceLogs(data, myLog);
+
     }
 
 
-    public void sendMessage(String msg){
+    public ArrayList<Sensor> createSensors() {
+        ArrayList<Sensor> sensors = new ArrayList<>();
+
+        sensors.add(new Sensor("Temperature", Sensor.OFF));
+        sensors.add(new Sensor("Fan", Sensor.OFF));
+        sensors.add(new Sensor("Heater", Sensor.OFF));
+
+        return sensors;
+
+    }
+
+    public void sendMessage(String msg) {
+        bluetoothService.send(msg.getBytes());
+    }
+
+
+    public void connectToZigbeeController(){
+        deviceConnectedTO.setText("Connecting...");
+        deviceConnectedTO.setTextColor(ContextCompat.getColor(this, R.color.platinum));
+
+        zigbeeController = bluetoothAdapter.getRemoteDevice(zigbeeControllerMac);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            bluetoothService.connect(zigbeeController, bluetoothService.SPP_MODE);
+        }
+
         if(bluetoothService.isConnected()){
-            bluetoothService.send(msg.getBytes());
+            deviceConnectedTO.setText(String.format("%s %s", "Connected to", Utils.getName(bluetoothService.getRemoteDevice())));
+            deviceConnectedTO.setTextColor(ContextCompat.getColor(this, R.color.green));
         }
     }
-
-
-
 
 
 

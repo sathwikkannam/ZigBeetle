@@ -44,12 +44,13 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-    <string name="settings">settings</string>
+
+
+
+
     <string name="english" />
     <string name="white_theme" />
-    <string name="change_schedule" />
-    <string name="Settings" />
-    <string name="settings1">Settings</string>
+    <string name="Settings">Settings</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="device_name">Device name</string>
     <string name="mac_address">MAC address</string>
@@ -57,11 +58,12 @@
     <string name="polling_rate">Polling rate</string>
     <string name="home">Home</string>
     <string name="todo">TODO</string>
-    <string name="connectioned">CONNECTIONED:</string>
     <string name="state">State</string>
-    <string name="mac">MAC</string>
     <string name="connection">Connection</string>
-    <string name="connected_to_none">Connected to: None</string>
-    <string name="mac1">Mac:</string>
     <string name="time">Time</string>
+    <string name="status">Status: </string>
+    <string name="sensor_name">Sensor name</string>
+    <string name="turn_off">OFF</string>
+    <string name="turn_on"> ON </string>
+    <string name="disconnected">Disconnected</string>
 </resources>

@@ -18,8 +18,10 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import hkr.wireless.zigbeetleapp.R;
+import hkr.wireless.zigbeetleapp.Utils;
 import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
 
 public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
@@ -52,7 +54,8 @@ public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, Bluetooth_Discovery_Activity.REQUEST_ENABLE_BT);
         }
 
-        deviceName.setText((device.getName() == null)? "Unknown Name": device.getName());
+        deviceName.setText((Objects.equals(Utils.getName(device), device.getAddress()))? "Unknown Name" : Utils.getName(device));
+        //deviceName.setText((device.getName() == null)? "Unknown Name": device.getName());
         MAC.setText(device.getAddress());
 
         return convertView;

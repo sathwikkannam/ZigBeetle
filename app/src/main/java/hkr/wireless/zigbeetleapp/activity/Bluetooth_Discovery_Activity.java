@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
-import hkr.wireless.zigbeetleapp.StorageKeys;
+import hkr.wireless.zigbeetleapp.Utils;
 import hkr.wireless.zigbeetleapp.adapters.ViewBluetoothAdapter;
 import hkr.wireless.zigbeetleapp.log.MyLog;
 
@@ -44,7 +44,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     public static BluetoothDevice pairedDevice = null;
     private MyLog myLog;
     private Data data;
-    BluetoothService bluetoothService;
+    private BluetoothService bluetoothService;
 
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -58,7 +58,6 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                     if (!devices.contains(device)) {
                         viewBluetoothAdapter.add(device);
                         viewBluetoothAdapter.notifyDataSetChanged();
-                        listView.setSelection(devices.size() - 1);
                     }
 
                     break;
@@ -71,15 +70,13 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                         ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
                     }
 
-                    String name = (device.getName() == null)? device.getAddress() : device.getName();
+                    //String name = (device.getName() == null)? device.getAddress() : device.getName();
+                    String name = Utils.getName(device);
 
                     switch (device.getBondState()) {
                         case BluetoothDevice.BOND_BONDED: {
                             Toast.makeText(activity, "Paired to " + name, Toast.LENGTH_SHORT).show();
-                            myLog.add(String.format("%s %s", "Paired to", name));
                             pairedDevice = device;
-                            bluetoothService = BluetoothService.getInstance(activity);
-                            bluetoothService.connect(device);
                             break;
                         }
                         case BluetoothDevice.BOND_BONDING: {
@@ -115,12 +112,12 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
 
         myLog = MyLog.getInstance();
         data = Data.getInstance(this);
+        bluetoothService = BluetoothService.getInstance(this);
         listView.setOnItemClickListener(this);
         this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.platinum));
 
-        toHome.setOnClickListener(View -> startActivity(new Intent(this, MainActivity.class).putExtra(StorageKeys.DEVICE_FROM_BLUETOOTH_ACTIVITY, pairedDevice)));
-        toSettings.setOnClickListener(View -> startActivity(new Intent(this, Settings_Activity.class)));
-
+        toHome.setOnClickListener(View -> Utils.startActivity(this, MainActivity.class));
+        toSettings.setOnClickListener(View -> Utils.startActivity(this, Settings_Activity.class));
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
@@ -137,7 +134,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         IntentFilter bondFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(receiver, bondFilter);
+        //registerReceiver(receiver, bondFilter);
 
         viewBluetoothAdapter = new ViewBluetoothAdapter(getApplicationContext(), this, R.layout.bluetooth_device_item, devices);
         listView.setAdapter(viewBluetoothAdapter);
@@ -149,9 +146,59 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     }
 
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
+    }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_ENABLE_BT);
+        }
+
+
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
+
+        //Utils.replaceLogs(data, data.getLogs(), myLog.getLogs());
+    }
+
+
+    /**
+     * @param adapterView Bluetooth_devices adapter
+     * @param view bluetooth_device_item
+     * @param i Index that points to a BluetoothDevice in devices arraylist.
+     * @param l
+     *
+     * Creates a bond upon clicking on a item in the listview
+     */
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_ENABLE_BT);
+        }
+
+        bluetoothAdapter.cancelDiscovery();
+
+        Toast.makeText(activity, "Connecting to " + Utils.getName(devices.get(i)), Toast.LENGTH_SHORT).show();
+        bluetoothService.connect(devices.get(i), bluetoothService.NORMAL_MODE);
+
+        if(bluetoothService.isConnected()){
+            Toast.makeText(activity, "Connected " + Utils.getName(devices.get(i)), Toast.LENGTH_SHORT).show();
+            myLog.add(String.format("%s %s", "Connected to", Utils.getName(devices.get(i))));
+        }
+
+    }
+
+
     /**
      * @param enable true = on and false = off.
-     * Turn bluetooth on of off
+     * Turn bluetooth on or off
      */
     public void setBluetooth(boolean enable) {
         if (bluetoothAdapter == null) {
@@ -174,7 +221,6 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
             bluetoothAdapter.disable();
 
         }
-
 
     }
 
@@ -218,53 +264,6 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
 
         IntentFilter discoverIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, discoverIntent);
-
-
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(receiver);
-
-        //NEEW.replaceLogs(data, data.getLogs(), myLog.getLogs());
-
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_ENABLE_BT);
-        }
-
-
-        if (bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.cancelDiscovery();
-        }
-
-        //unregisterReceiver(receiver);
-        //Utils.replaceLogs(data, data.getLogs(), myLog.getLogs());
-    }
-
-
-    /**
-     * @param adapterView Bluetooth_devices adapter
-     * @param view bluetooth_device_item
-     * @param i Index that points to a BluetoothDevice in devices arraylist.
-     * @param l
-     *
-     * Creates a bond upon clicking on a item in the listview
-     */
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, REQUEST_ENABLE_BT);
-        }
-        bluetoothAdapter.cancelDiscovery();
-        devices.get(i).createBond();
 
     }
 
