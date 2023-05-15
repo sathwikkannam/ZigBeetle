@@ -1,4 +1,4 @@
-package hkr.wireless.zigbeetleapp;
+package hkr.wireless.zigbeetleapp.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -6,17 +6,18 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
-import hkr.wireless.zigbeetleapp.activity.MainActivity;
-import hkr.wireless.zigbeetleapp.log.LogFormat;
+import hkr.wireless.zigbeetleapp.Constants;
+import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.log.MyLog;
 
-public class Utils {
+public class Common {
 
     // Maps MAC address to a custom Alias/Name if BluetoothDevice as no name.
     private static final HashMap<String, String> myDevices = new HashMap<String, String>(){{
-       put(MainActivity.zigbeeControllerMac, "Zigbee Controller");
+       put(Constants.zigbeeControllerMac, "Zigbee Controller");
     }};
 
 
@@ -41,13 +42,22 @@ public class Utils {
 
 
 
-    public static void replaceLogs(Data data, MyLog myLog){
-        ArrayList<LogFormat> storedLogs = data.getLogs();
-        ArrayList<LogFormat> tempLogs = myLog.getLogs();
+    public static void addLog(Data data, MyLog myLog){
+        ArrayList<MyLog> storedLogs = data.getLogs();
 
+        if(storedLogs != null && !storedLogs.isEmpty()){
+            storedLogs.add(myLog);
+            data.storeLogs(storedLogs);
+        }else{
+            data.storeLogs(new ArrayList<>(Collections.singletonList(myLog)));
+        }
     }
+
 
     public static <T> void startActivity(Activity from, Class<T> to){
         from.startActivity(new Intent(from, to));
     }
+
+
+
 }

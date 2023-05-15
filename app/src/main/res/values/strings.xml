@@ -67,4 +67,8 @@
     <string name="turn_on"> ON </string>
     <string name="disconnected">Disconnected</string>
     <string name="connecting">Connecting…</string>
+    <string name="Connected">Connected to</string>
+    <string name="pan_id">PAN ID</string>
+    <string name="parameter_value">Additional_value</string>
+    <string name="parameter_name">Parameter name:</string>
 </resources>

@@ -14,14 +14,14 @@ import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 
-import hkr.wireless.zigbeetleapp.log.LogFormat;
+import hkr.wireless.zigbeetleapp.log.MyLog;
 import hkr.wireless.zigbeetleapp.R;
 
-public class LogsAdapter extends ArrayAdapter<LogFormat> {
+public class LogsAdapter extends ArrayAdapter<MyLog> {
 
     private final int resource;
 
-    public LogsAdapter(@NonNull Context context, int resource, @NonNull ArrayList<LogFormat> objects) {
+    public LogsAdapter(@NonNull Context context, int resource, @NonNull ArrayList<MyLog> objects) {
         super(context, resource, objects);
         this.resource = resource;
     }
@@ -31,7 +31,7 @@ public class LogsAdapter extends ArrayAdapter<LogFormat> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LogFormat log = getItem(position);
+        MyLog log = getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(

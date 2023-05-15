@@ -15,6 +15,12 @@
 local.properties
 
 
+
+# Tests
+ZigBeetle/app/src/androidTest/
+ZigBeetle/app/src/test/
+
+
 # Gradle files
 .gradle/
 build/

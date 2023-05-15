@@ -20,9 +20,9 @@ import androidx.core.app.ActivityCompat;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.R;
-import hkr.wireless.zigbeetleapp.Utils;
-import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
+import hkr.wireless.zigbeetleapp.utils.Common;
 
 public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
     private final int resource;
@@ -51,17 +51,15 @@ public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
         TextView MAC = convertView.findViewById(R.id.mac_address);
 
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, Bluetooth_Discovery_Activity.REQUEST_ENABLE_BT);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, Constants.REQUEST_ENABLE_BT);
         }
 
-        deviceName.setText((Objects.equals(Utils.getName(device), device.getAddress()))? "Unknown Name" : Utils.getName(device));
+        deviceName.setText((Objects.equals(Common.getName(device), device.getAddress()))? "Unknown Name" : Common.getName(device));
         //deviceName.setText((device.getName() == null)? "Unknown Name": device.getName());
         MAC.setText(device.getAddress());
 
         return convertView;
     }
-
-
 
 
 }

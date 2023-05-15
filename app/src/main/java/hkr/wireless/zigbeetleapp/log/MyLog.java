@@ -1,34 +1,56 @@
 package hkr.wireless.zigbeetleapp.log;
 
-import java.util.ArrayList;
+import android.os.Build;
 
-public class MyLog {
-    private final ArrayList<LogFormat> logs;
-    private static MyLog myLog;
+import androidx.annotation.NonNull;
 
-    private MyLog(){
-        this.logs = new ArrayList<>();
-    }
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
-    public static MyLog getInstance(){
-        if(myLog == null){
-            myLog =  new MyLog();
+public class MyLog implements Comparable<MyLog>{
+
+    private String date;
+    private final String log;
+    private String time;
+
+
+
+    public MyLog(String log){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            this.date = LocalDate.now().toString();
+            this.time = LocalTime.parse(LocalTime.now().toString(), DateTimeFormatter.ofPattern("H:mm:ss")).toString();
         }
 
-        return myLog;
+        this.log = log;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getLog() {
+        return log;
+    }
+
+    public String getTime() {
+        return time;
     }
 
 
-    public void add(String log){
-        logs.add(new LogFormat(log));
+    @NonNull
+    @Override
+    public String toString(){
+        return String.format("%s %s | %s", getDate(), getTime(), getLog());
     }
 
+    @Override
+    public int compareTo(MyLog logFormat) {
+        if(this.toString().equals(logFormat.toString())){
+            return 1;
+        }
 
-    public ArrayList<LogFormat> getLogs() {
-        return logs;
+        return  0;
     }
-
-
-
-
 }

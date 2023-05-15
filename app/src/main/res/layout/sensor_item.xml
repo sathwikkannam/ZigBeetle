@@ -66,6 +66,49 @@
             android:fontFamily="sans-serif-black" />
 
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/PAN_ID"
+            android:text="@string/pan_id"
+            android:layout_below="@+id/status"
+            android:textSize="15sp"
+            android:textColor="@color/platinum"
+            android:fontFamily="sans-serif-black"/>
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/parameter_name"
+            android:text="@string/parameter_name"
+            android:layout_below="@+id/PAN_ID"
+            android:textSize="15sp"
+            android:visibility="gone"
+            android:textColor="@color/platinum"
+            android:fontFamily="sans-serif-black"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toEndOf="@+id/parameter_name"
+            android:id="@+id/parameter_value"
+            android:visibility="gone"
+            android:text="@string/parameter_value"
+            android:layout_below="@+id/PAN_ID"
+            android:textSize="15sp"
+            android:textColor="@color/platinum"
+            android:fontFamily="sans-serif-black"/>
+
+
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,7 +117,7 @@
             android:id="@+id/controls"
             android:layout_toEndOf="@+id/sensor_name">
 
-            <TextView
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
@@ -84,29 +127,33 @@
                 android:textSize="20sp"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:background="@drawable/curved_squared"
+                android:clickable="true"
                 android:text="@string/turn_on"
                 android:layout_alignParentEnd="true"
-                android:id="@+id/turn_ON"/>
+                android:id="@+id/turn_ON"
+                android:backgroundTint="@color/platinum"
+                android:focusable="true" />
 
 
-            <TextView
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:layout_marginTop="10dp"
                 android:layout_alignParentEnd="true"
+                android:clickable="true"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
                 android:textSize="20sp"
                 android:layout_marginBottom="10dp"
                 android:paddingBottom="10dp"
-                android:background="@drawable/curved_squared"
                 android:textColor="@color/red"
                 android:text="@string/turn_off"
                 android:id="@+id/turn_OFF"
-                android:layout_below="@id/turn_ON"/>
+                android:layout_below="@id/turn_ON"
+                android:backgroundTint="@color/platinum"
+                android:focusable="true" />
 
         </RelativeLayout>
 

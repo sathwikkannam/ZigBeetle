@@ -13,9 +13,8 @@ import java.util.ArrayList;
 
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
-import hkr.wireless.zigbeetleapp.Utils;
+import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.adapters.LogsAdapter;
-import hkr.wireless.zigbeetleapp.log.LogFormat;
 import hkr.wireless.zigbeetleapp.log.MyLog;
 
 public class Settings_Activity extends AppCompatActivity {
@@ -23,8 +22,7 @@ public class Settings_Activity extends AppCompatActivity {
     private ListView logsListView;
     public static LogsAdapter logsAdapter;
     private Data data;
-    private ArrayList<LogFormat> storedLogs;
-    private MyLog myLog;
+    private ArrayList<MyLog> storedLogs;
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
@@ -38,19 +36,37 @@ public class Settings_Activity extends AppCompatActivity {
         toBluetooth = findViewById(R.id.toBluetooth);
         logsListView = findViewById(R.id.logs);
         data = Data.getInstance(this);
-        myLog = MyLog.getInstance();
-        storedLogs = data.getLogs();
         logsAdapter =  new LogsAdapter(this, R.layout.log_item, storedLogs);
 
-        toHome.setOnClickListener(View -> Utils.startActivity(this, MainActivity.class));
-        toBluetooth.setOnClickListener(View -> Utils.startActivity(this, Bluetooth_Discovery_Activity.class));
+        toHome.setOnClickListener(View -> Common.startActivity(this, MainActivity.class));
+        toBluetooth.setOnClickListener(View -> Common.startActivity(this, Bluetooth_Discovery_Activity.class));
 
-        if(storedLogs != null){
-            if(!storedLogs.isEmpty()){
-                logsListView.setAdapter(logsAdapter);
-            }
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+
+    /**
+     * Sets adapter to logsListView in onResume() as the storedLogs might be changed in other activities.
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        storedLogs = data.getLogs();
+        if(storedLogs != null && !storedLogs.isEmpty()){
+            logsAdapter =  new LogsAdapter(this, R.layout.log_item, storedLogs);
+            logsListView.setAdapter(logsAdapter);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
 
     }
 
@@ -60,9 +76,4 @@ public class Settings_Activity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        //Utils.replaceLogs(data, myLog);
-    }
 }

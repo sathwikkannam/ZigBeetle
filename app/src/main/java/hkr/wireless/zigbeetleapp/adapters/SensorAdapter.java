@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,11 +45,26 @@ public class SensorAdapter extends ArrayAdapter<Sensor> implements View.OnClickL
 
         TextView name = convertView.findViewById(R.id.sensor_name);
         TextView status = convertView.findViewById(R.id.status);
-        TextView on = convertView.findViewById(R.id.turn_ON);
-        TextView off = convertView.findViewById(R.id.turn_OFF);
+        TextView panID = convertView.findViewById(R.id.PAN_ID);
+        Button on = convertView.findViewById(R.id.turn_ON);
+        Button off = convertView.findViewById(R.id.turn_OFF);
+        TextView parameterValue = convertView.findViewById(R.id.parameter_value);
+        TextView parameterName = convertView.findViewById(R.id.parameter_name);
+
+        if(sensor.getParameterValue() != null && sensor.getParameter() != null){
+            parameterValue.setText(sensor.getParameterValue());
+            parameterName.setText(String.format("%s:", sensor.getParameter()));
+
+            parameterValue.setVisibility(View.VISIBLE);
+            parameterName.setVisibility(View.VISIBLE);
+        }
+
+        on.setOnClickListener(this);
+        off.setOnClickListener(this);
 
         name.setText(sensor.getName());
         status.setText(sensor.getStatus());
+        panID.setText(sensor.getPanID());
 
         return convertView;
     }
@@ -59,7 +75,6 @@ public class SensorAdapter extends ArrayAdapter<Sensor> implements View.OnClickL
         if(view.getId() == R.id.turn_OFF){
 
         }else if(view.getId() == R.id.turn_ON) {
-
 
         }
 
