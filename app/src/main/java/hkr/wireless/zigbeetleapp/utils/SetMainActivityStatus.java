@@ -14,7 +14,7 @@ import hkr.wireless.zigbeetleapp.R;
 public class SetMainActivityStatus extends Thread{
     private final TextView statusView;
     private final BluetoothService bluetoothService;
-    private boolean start;
+    private boolean state;
     private final Activity activity;
     private String previousState;
 
@@ -22,14 +22,14 @@ public class SetMainActivityStatus extends Thread{
         this.statusView = statusView;
         this.bluetoothService = bluetoothService;
         this.activity = activity;
-        start = true;
+        state = true;
     }
 
 
     @SuppressLint("SetTextI18n")
     @Override
     public void run(){
-        while(start){
+        while(state){
             String state = this.bluetoothService.getStatus();
 
             if(!state.equals(previousState)){
@@ -65,7 +65,7 @@ public class SetMainActivityStatus extends Thread{
     }
 
 
-    public void setStart(boolean start) {
-        this.start = start;
+    public void setState(boolean start) {
+        this.state = start;
     }
 }

@@ -1,5 +1,6 @@
 package hkr.wireless.zigbeetleapp.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,7 +21,7 @@ import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.Sensor;
 
-public class SensorAdapter extends ArrayAdapter<Sensor> implements View.OnClickListener {
+public class SensorAdapter extends ArrayAdapter<Sensor> {
 
     private final int resource;
     private final BluetoothService bluetoothService;
@@ -59,26 +61,21 @@ public class SensorAdapter extends ArrayAdapter<Sensor> implements View.OnClickL
             parameterName.setVisibility(View.VISIBLE);
         }
 
-        on.setOnClickListener(this);
-        off.setOnClickListener(this);
+        on.setOnClickListener(view -> {
+
+        });
+
+        off.setOnClickListener(view -> {
+
+
+
+        });
 
         name.setText(sensor.getName());
         status.setText(sensor.getStatus());
         panID.setText(sensor.getPanID());
 
         return convertView;
-    }
-
-
-    @Override
-    public void onClick(View view) {
-        if(view.getId() == R.id.turn_OFF){
-
-        }else if(view.getId() == R.id.turn_ON) {
-
-        }
-
-
     }
 
 }

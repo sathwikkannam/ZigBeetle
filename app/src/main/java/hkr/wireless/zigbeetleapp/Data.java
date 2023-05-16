@@ -8,16 +8,15 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import hkr.wireless.zigbeetleapp.log.MyLog;
 
 
 public class Data{
-    private SharedPreferences.Editor writer;
-    private SharedPreferences reader;
+    private final SharedPreferences.Editor writer;
+    private final SharedPreferences reader;
     private static Data data = null;
-    private Gson gson;
+    private final Gson gson;
     private String DATA_NAME = "DATA_NAME";
 
     private Data(Context context) {
@@ -39,10 +38,6 @@ public class Data{
     public void storeLogs(ArrayList<MyLog> logs){
         this.writer.putString(Constants.LOGS_LIST, new Gson().toJson(logs)).apply();
 
-    }
-
-    public void clearLogs(){
-        this.writer.remove(Constants.LOGS_LIST).apply();
     }
 
     public ArrayList<MyLog> getLogs(){
@@ -77,23 +72,5 @@ public class Data{
 
     public String getMac(){
         return this.reader.getString(Constants.PREVIOUS_CONNECTED_DEVICE_MAC, "");
-    }
-
-
-
-    public String getCharacteristicUUID() {
-        return this.reader.getString(Constants.STORE_CHARACTERISTIC_UUID, "");
-    }
-
-    public String getServiceUUID() {
-        return this.reader.getString(Constants.STORE_SERVICE_UUID, "");
-    }
-
-    public void storeCharacteristicUUID(String uuid) {
-        this.writer.putString(Constants.STORE_CHARACTERISTIC_UUID, uuid).apply();
-    }
-
-    public void storeServiceUUID(String uuid) {
-        this.writer.putString(Constants.STORE_SERVICE_UUID, uuid).apply();
     }
 }

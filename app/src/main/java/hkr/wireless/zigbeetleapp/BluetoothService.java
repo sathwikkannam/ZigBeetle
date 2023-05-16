@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.ParcelUuid;
@@ -25,24 +26,21 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
+import hkr.wireless.zigbeetleapp.activity.MainActivity;
 import hkr.wireless.zigbeetleapp.log.MyLog;
 import hkr.wireless.zigbeetleapp.utils.Common;
-import hkr.wireless.zigbeetleapp.utils.ToActivity;
 
 public class BluetoothService extends Thread {
     private final UUID SPP_PROFILE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private final String NAME = "ZIGBEE_APP";
     private final BluetoothAdapter adapter;
     private BluetoothSocket bluetoothSocket;
     private InputStream receivingStream;
     private OutputStream sendingStream;
-    private final Activity activity;
+    private Activity activity;
     private final int REQUEST_ENABLE_BT = 1;
     public static BluetoothService bluetoothService;
     private final Data data;
-    public BluetoothDevice pairedDevice;
     private final ArrayList<UUID> deviceUUIDS;
-    private ToActivity toMainActivity;
     private String status;
 
 
@@ -57,9 +55,7 @@ public class BluetoothService extends Thread {
         this.data = Data.getInstance(activity);
         this.deviceUUIDS = this.getDeviceUUIDS();
         this.deviceUUIDS.add(SPP_PROFILE);
-        this.pairedDevice = null;
         this.status = Constants.DISCONNECTED;
-
     }
 
 
@@ -80,7 +76,7 @@ public class BluetoothService extends Thread {
 
 
     /**
-     * @param msg A send message to send to the remote device.
+     * @param msg A message to send to the remote device.
      */
     public void send(byte[] msg) {
         if (this.sendingStream == null) {
@@ -93,9 +89,8 @@ public class BluetoothService extends Thread {
                 this.sendingStream.flush();
                 this.sendingStream.write(msg);
                 Common.addLog(this.data, new MyLog(String.format("%s %s %s %s", "Sent", new String(msg), "to", Common.getName(this.bluetoothSocket.getRemoteDevice()))));
-                Log.d(Constants.TAG, "Sent message");
             } catch (IOException e) {
-                Log.d(Constants.TAG, "Error sending message, and is sending stream null: " + String.valueOf(this.sendingStream == null));
+                e.printStackTrace();
 
             }
 
@@ -104,26 +99,22 @@ public class BluetoothService extends Thread {
 
 
     /**
-     * Constantly listens for incoming data.
+     * Constantly listens for incoming data in a separate thread.
      */
     @Override
     public void run(){
         byte[] response = new byte[1024];
         int outcome;
 
-        while (isConnected() && this.receivingStream != null){
+        while (isConnected()){
             try {
                 outcome = this.receivingStream.read(response);
+                activity.sendBroadcast(new Intent(Constants.INCOMING_DATA).putExtra(Constants.DATA, response));
 
-                if (outcome != -1) {
+                Thread.sleep(1000);
 
-                    // CHANGE THIS
-                    Common.addLog(this.data, new MyLog(String.format("%s %s %s %s", "Received", new String(response), "from", Common.getName(bluetoothSocket.getRemoteDevice()))));
-                    this.toMainActivity.sentData(response);
-                }
-
-            } catch (IOException e) {
-
+            } catch (IOException | InterruptedException e) {
+                Toast.makeText(activity, "Error sending message", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -140,6 +131,12 @@ public class BluetoothService extends Thread {
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void connect(BluetoothDevice device) {
         if (device == null) {
+            return;
+        }
+
+
+        if(this.isConnected() && this.getRemoteDevice() == device){
+            sendToast("Already connected to " + Common.getName(device));
             return;
         }
 
@@ -168,13 +165,12 @@ public class BluetoothService extends Thread {
             this.deviceUUIDS.add(0, UUID.fromString(data.getUUID()));
         }
 
-        // Try to connect to the remote device with the available UUIDs until an exception occurs.
+        // Tries to connect to the remote device with the available UUIDs until an exception occurs.
         // Running it on a new Thread as bluetoothSocket.connect() is a blocking call.
         Executors.newSingleThreadExecutor().execute(() -> {
             for (UUID uuid : this.deviceUUIDS) {
                 try {
                     connectSocket(device, uuid);
-                    this.pairedDevice = device;
                     data.storeUUID(uuid.toString());
                     break;
                 } catch (IOException | NullPointerException f) {
@@ -199,11 +195,10 @@ public class BluetoothService extends Thread {
             if (this.isConnected()) {
                 this.status = Constants.CONNECTED;
                 this.sendToast("Connected to " + Common.getName(device));
-                this.pairedDevice = device;
                 this.data.storeMac(device.getAddress());
 
-                if(!this.isAlive()){
-                    //this.start();
+                if(!this.isAlive() && this.receivingStream != null){
+                    this.start();
                 }
 
                 Common.addLog(this.data, new MyLog(String.format("%s %s", "Connected to", Common.getName(device))));
@@ -322,6 +317,7 @@ public class BluetoothService extends Thread {
                 e.printStackTrace();
             }
         }
+
     }
 
     /**
@@ -343,7 +339,6 @@ public class BluetoothService extends Thread {
     }
 
 
-
     /**
      * Send a toast that is run on UI thread.
      * Only sends a Toast if the BluetoothService object is created Bluetooth_Discovery_Activity
@@ -356,6 +351,17 @@ public class BluetoothService extends Thread {
                 this.activity.runOnUiThread(() -> Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show());
             }
         }
+    }
+
+    public void setActivity(Activity activity){
+        this.activity = activity;
+    }
+
+    public Intent sendBroadcast(String action){
+        if(this.activity.getClass() == MainActivity.class){
+            return new Intent(action);
+        }
+        return null;
     }
 
 

@@ -20,7 +20,7 @@ public class MyLog implements Comparable<MyLog>{
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             this.date = LocalDate.now().toString();
-            this.time = LocalTime.parse(LocalTime.now().toString(), DateTimeFormatter.ofPattern("H:mm:ss")).toString();
+            this.time = LocalTime.now().toString();
         }
 
         this.log = log;
