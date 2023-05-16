@@ -1,26 +1,24 @@
 package hkr.wireless.zigbeetleapp.activity;
 
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Constants;
@@ -32,34 +30,41 @@ import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.adapters.SensorAdapter;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     private LinearLayout toBluetooth, toSettings;
     private BluetoothService bluetoothService;
     private ListView sensorsListView;
     private ArrayList<Sensor> sensors;
     private SensorAdapter sensorAdapter;
     private BluetoothAdapter bluetoothAdapter;
-    private BluetoothDevice previousConnectedDevice;
+    private String previousConnectedDeviceMac;
     private TextView status;
     private Data data;
     private SetMainActivityStatus setMainActivityStatus;
-    private Activity activity;
-    private final ArrayList<String> broadcastReceiverActions = new ArrayList<>(Arrays.asList(
-            Constants.INCOMING_DATA
-    ));
 
-    private final BroadcastReceiver broadcastReceiver =  new BroadcastReceiver() {
 
+    // This handler controls sending and receiving data from and to the remote device.
+    private final Handler handler = new Handler(Looper.getMainLooper()){
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
 
-            if(action.equals(Constants.INCOMING_DATA)){
-                byte[] data = intent.getByteArrayExtra(Constants.DATA);
-                Toast.makeText(activity, "Test", Toast.LENGTH_SHORT).show();
+            if (msg.what == Constants.INCOMING_DATA) {
+                byte[] incoming_data = (byte[]) msg.obj;
+
+                //Common.addLog(data, new MyLog(String.format("")));
+                //sensorAdapter.addAll(sensors);
+                //sensorAdapter.notifyDataSetChanged();
+            }else if (msg.what == Constants.WRITE_MESSAGE){
+                Sensor sensor = (Sensor) msg.obj;
+                int arg = msg.arg1; // ON or OFF.
+
+                // Create a ZIGBEE PACKET HERE.
+
             }
         }
     };
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -87,12 +92,10 @@ public class MainActivity extends AppCompatActivity{
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         setMainActivityStatus = new SetMainActivityStatus(status, bluetoothService, this);
         sensors = (data.getSensors() != null && !data.getSensors().isEmpty())? data.getSensors() : createSensors();
-        registerActions();
 
 
         toSettings.setOnClickListener(View -> Common.startActivity(this, Settings_Activity.class));
         toBluetooth.setOnClickListener(View -> Common.startActivity(this, Bluetooth_Discovery_Activity.class));
-
     }
 
 
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity{
 
         Common.checkBluetoothPermission(this);
 
-        sensorAdapter = new SensorAdapter(this, bluetoothService, R.layout.sensor_item, sensors);
+        sensorAdapter = new SensorAdapter(this, R.layout.sensor_item, sensors, handler);
         sensorsListView.setAdapter(sensorAdapter);
 
     }
@@ -115,15 +118,16 @@ public class MainActivity extends AppCompatActivity{
         super.onResume();
 
         bluetoothService.setActivity(this);
+        bluetoothService.setHandler(handler);
 
-        if (!bluetoothService.isConnected() && data.getMac() != null && !data.getMac().equals("")) {
+        if (!bluetoothService.isConnected() && !data.getMac().isEmpty()) {
 
             if (!bluetoothAdapter.isEnabled()) {
                 Common.checkBluetoothPermission(this);
                 bluetoothAdapter.enable();
             }
 
-            previousConnectedDevice = bluetoothAdapter.getRemoteDevice(data.getMac());
+            previousConnectedDeviceMac = data.getMac();
             connectToPreviousConnectedDevice();
         }
 
@@ -148,7 +152,6 @@ public class MainActivity extends AppCompatActivity{
     public void onDestroy() {
         super.onDestroy();
         bluetoothService.close();
-        unregisterReceiver(broadcastReceiver);
     }
 
 
@@ -157,7 +160,7 @@ public class MainActivity extends AppCompatActivity{
      */
     public ArrayList<Sensor> createSensors() {
         return new ArrayList<>(Arrays.asList(
-                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_SENSOR_PAN_ID, "Temperature"),
+                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_SENSOR_PAN_ID, "Temperature: "),
                 new Sensor("Fan", Sensor.OFF, Constants.FAN_SENSOR_PAN_ID),
                 new Sensor("Heater", Sensor.OFF, Constants.HEATER_SENSOR_PAN_ID)
         ));
@@ -173,8 +176,8 @@ public class MainActivity extends AppCompatActivity{
         try{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
-                if(previousConnectedDevice != null){
-                    bluetoothService.connect(previousConnectedDevice);
+                if(previousConnectedDeviceMac != null){
+                    bluetoothService.connect(previousConnectedDeviceMac);
                 }
             }
         }catch (IllegalArgumentException e){
@@ -183,14 +186,18 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+    public int findSensorByName(String name){
+        AtomicInteger i = new AtomicInteger();
+        i.set(0);
 
-    public void registerActions(){
-        final IntentFilter intentFilter = new IntentFilter();
-        broadcastReceiverActions.forEach(intentFilter::addAction);
+        sensors.forEach(sensor ->{
+            if(sensor.getName().equals(name)){
+                i.set(sensors.indexOf(sensor));
+            }
+        });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            registerReceiver(broadcastReceiver, intentFilter);
-        }
+        return i.get();
     }
+
 
 }

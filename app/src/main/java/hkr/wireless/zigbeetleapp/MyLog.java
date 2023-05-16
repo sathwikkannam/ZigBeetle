@@ -1,4 +1,4 @@
-package hkr.wireless.zigbeetleapp.log;
+package hkr.wireless.zigbeetleapp;
 
 import android.os.Build;
 
@@ -6,14 +6,12 @@ import androidx.annotation.NonNull;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class MyLog implements Comparable<MyLog>{
 
     private String date;
     private final String log;
     private String time;
-
 
 
     public MyLog(String log){

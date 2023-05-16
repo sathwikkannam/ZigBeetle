@@ -14,7 +14,7 @@ import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 
-import hkr.wireless.zigbeetleapp.log.MyLog;
+import hkr.wireless.zigbeetleapp.MyLog;
 import hkr.wireless.zigbeetleapp.R;
 
 public class LogsAdapter extends ArrayAdapter<MyLog> {

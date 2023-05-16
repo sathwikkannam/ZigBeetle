@@ -1,35 +1,37 @@
 package hkr.wireless.zigbeetleapp.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-import hkr.wireless.zigbeetleapp.BluetoothService;
+import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.Sensor;
 
 public class SensorAdapter extends ArrayAdapter<Sensor> {
 
     private final int resource;
-    private final BluetoothService bluetoothService;
+    private final Handler handler;
+    private final ArrayList<Sensor> sensors;
 
-    public SensorAdapter(@NonNull Context context, BluetoothService bluetoothService, int resource, @NonNull ArrayList<Sensor> objects) {
+    public SensorAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Sensor> objects, Handler handler) {
         super(context, resource, objects);
         this.resource = resource;
-        this.bluetoothService = bluetoothService;
+        this.handler = handler;
+        this.sensors = objects;
     }
 
 
@@ -61,19 +63,14 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
             parameterName.setVisibility(View.VISIBLE);
         }
 
-        on.setOnClickListener(view -> {
-
-        });
-
-        off.setOnClickListener(view -> {
-
-
-
-        });
 
         name.setText(sensor.getName());
-        status.setText(sensor.getStatus());
-        panID.setText(sensor.getPanID());
+        status.setText((sensor.getStatus() == Sensor.ON)? "ON" : "OFF");
+        panID.setText(Arrays.toString(sensor.getPanID()));
+
+
+        on.setOnClickListener(view -> handler.obtainMessage(Constants.WRITE_MESSAGE, Sensor.ON, 0, sensor));
+        off.setOnClickListener(view -> handler.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensor));
 
         return convertView;
     }

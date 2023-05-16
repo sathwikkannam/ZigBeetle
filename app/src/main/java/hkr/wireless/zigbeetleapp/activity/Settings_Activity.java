@@ -15,7 +15,7 @@ import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.adapters.LogsAdapter;
-import hkr.wireless.zigbeetleapp.log.MyLog;
+import hkr.wireless.zigbeetleapp.MyLog;
 
 public class Settings_Activity extends AppCompatActivity {
     private LinearLayout toHome, toBluetooth;

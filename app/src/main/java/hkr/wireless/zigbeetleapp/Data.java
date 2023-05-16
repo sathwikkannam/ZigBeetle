@@ -9,8 +9,6 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-import hkr.wireless.zigbeetleapp.log.MyLog;
-
 
 public class Data{
     private final SharedPreferences.Editor writer;

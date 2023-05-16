@@ -22,17 +22,24 @@ public class Constants {
      */
     public static final String ZIGBEE_CONTROLLER_MAC = "00:06:66:4A:67:86";
     public static final String ZIGBEE_CONTROLLER_PIN = "1234";
-    public static final String TEMPERATURE_SENSOR_PAN_ID = "null";
-    public static final String FAN_SENSOR_PAN_ID = "null";
-    public static final String HEATER_SENSOR_PAN_ID = "null";
+    public static final byte[] TEMPERATURE_SENSOR_PAN_ID = "null".getBytes();
+    public static final byte[] FAN_SENSOR_PAN_ID = "null".getBytes();
+    public static final byte[] HEATER_SENSOR_PAN_ID = "null".getBytes();
 
 
     /*
-        BLUETOOTH ACTIONS
+        BLUETOOTH actions
      */
-    public static final String INCOMING_DATA = "Data received";
     public static final String CONNECTING = "Connecting...";
     public static final String CONNECTED = "Connected";
     public static final String DISCONNECTED = "Disconnected";
-    public static final String DATA = "DATA";
+    public static final String NO_DEVICE_FOUND = "Can't find device";
+    public static final int ZIGBEE_PACKET_MTU = 1024;
+
+
+    /*
+        MainActivity Handler actions.
+     */
+    public static final int INCOMING_DATA = 1;
+    public static final int WRITE_MESSAGE = 2;
 }

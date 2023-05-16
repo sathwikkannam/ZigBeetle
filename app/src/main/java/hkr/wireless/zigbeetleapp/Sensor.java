@@ -2,22 +2,22 @@ package hkr.wireless.zigbeetleapp;
 
 public class Sensor {
     private final String name;
-    private final String status;
-    public static final String OFF = "OFF";
-    public static final String ON = "ON";
+    private final int  status;
+    public static final int OFF = 1;
+    public static final int ON = 0;
     private String parameterValue = null;
     private String parameter = null;
-    private final String panID;
+    private final byte[] panID;
 
 
-    public Sensor(String name, String status, String panID){
+    public Sensor(String name, int status, byte[] panID){
         this.name = name;
         this.status = status;
         this.panID = panID;
 
     }
 
-    public Sensor(String name, String status, String panID, String parameter){
+    public Sensor(String name, int status, byte[] panID, String parameter){
         this.name = name;
         this.status = status;
         this.panID = panID;
@@ -31,7 +31,7 @@ public class Sensor {
     }
 
 
-    public String getStatus() {
+    public int getStatus() {
         return this.status;
 
     }
@@ -44,7 +44,7 @@ public class Sensor {
         this.parameter = parameter;
     }
 
-    public String getPanID() {
+    public byte[] getPanID() {
         return this.panID;
     }
 

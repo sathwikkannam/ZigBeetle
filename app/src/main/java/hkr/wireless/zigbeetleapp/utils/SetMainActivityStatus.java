@@ -40,13 +40,16 @@ public class SetMainActivityStatus extends Thread{
                             statusView.setTextColor(ContextCompat.getColor(activity, R.color.green));
                             break;
                         case Constants.DISCONNECTED:
-                            statusView.setText("Disconnected");
+                            statusView.setText(Constants.DISCONNECTED);
                             statusView.setTextColor(ContextCompat.getColor(activity, R.color.red));
                             break;
                         case Constants.CONNECTING:
-                            statusView.setText("Connecting...");
+                            statusView.setText(Constants.CONNECTING);
                             statusView.setTextColor(ContextCompat.getColor(activity, R.color.platinum));
                             break;
+                        case Constants.NO_DEVICE_FOUND:
+                            statusView.setText(Constants.NO_DEVICE_FOUND);
+                            statusView.setTextColor(ContextCompat.getColor(activity, R.color.red));
                     }
 
                 });

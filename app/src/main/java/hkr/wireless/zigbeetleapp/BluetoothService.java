@@ -6,9 +6,9 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
@@ -26,13 +26,11 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
-import hkr.wireless.zigbeetleapp.activity.MainActivity;
-import hkr.wireless.zigbeetleapp.log.MyLog;
 import hkr.wireless.zigbeetleapp.utils.Common;
 
 public class BluetoothService extends Thread {
     private final UUID SPP_PROFILE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private final BluetoothAdapter adapter;
+    private final BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket bluetoothSocket;
     private InputStream receivingStream;
     private OutputStream sendingStream;
@@ -42,6 +40,7 @@ public class BluetoothService extends Thread {
     private final Data data;
     private final ArrayList<UUID> deviceUUIDS;
     private String status;
+    private Handler handler;
 
 
     /**
@@ -50,7 +49,7 @@ public class BluetoothService extends Thread {
      */
     @RequiresApi(api = Build.VERSION_CODES.S)
     private BluetoothService(Activity activity) {
-        this.adapter = BluetoothAdapter.getDefaultAdapter();
+        this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         this.activity = activity;
         this.data = Data.getInstance(activity);
         this.deviceUUIDS = this.getDeviceUUIDS();
@@ -103,13 +102,15 @@ public class BluetoothService extends Thread {
      */
     @Override
     public void run(){
-        byte[] response = new byte[1024];
-        int outcome;
+        byte[] response = new byte[Constants.ZIGBEE_PACKET_MTU];
 
-        while (isConnected()){
+        while (isConnected() && handler != null){
             try {
-                outcome = this.receivingStream.read(response);
-                activity.sendBroadcast(new Intent(Constants.INCOMING_DATA).putExtra(Constants.DATA, response));
+                this.receivingStream.read(response);
+
+                if(!new String(response).isEmpty()){
+                    handler.obtainMessage(Constants.INCOMING_DATA,  response).sendToTarget();
+                }
 
                 Thread.sleep(1000);
 
@@ -126,23 +127,34 @@ public class BluetoothService extends Thread {
      * This attempts to connect to the remote bluetooth device with either only SPP profile or
      * try's all UUIDs until a connection is made.
      *
-     * @param device A bluetoothDevice to connect to.
+     * @param mac Address of the remote device.
      */
     @RequiresApi(api = Build.VERSION_CODES.S)
-    public void connect(BluetoothDevice device) {
-        if (device == null) {
+    public void connect(String mac) {
+        BluetoothDevice device;
+
+        if (mac == null) {
+            return;
+        }
+
+        // Find device
+        try{
+            device = this.bluetoothAdapter.getRemoteDevice(mac);
+        }catch (IllegalArgumentException e){
+            this.status = Constants.NO_DEVICE_FOUND;
             return;
         }
 
 
-        if(this.isConnected() && this.getRemoteDevice() == device){
+        // If the selected device is already connected.
+        if(this.isConnected() && this.getRemoteDevice().getAddress().equals(mac)){
             sendToast("Already connected to " + Common.getName(device));
+            status = Constants.CONNECTED;
             return;
         }
 
         // Closes the bluetoothSocket if it is already connected.
         this.close();
-
 
         // Requires permission to cancel Discovery.
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -150,7 +162,7 @@ public class BluetoothService extends Thread {
         }
 
         // Discovery drains battery. Very expensive function.
-        adapter.cancelDiscovery();
+        bluetoothAdapter.cancelDiscovery();
 
         // Set state to connecting.
         this.status = Constants.CONNECTING;
@@ -161,7 +173,7 @@ public class BluetoothService extends Thread {
 
         // If there is stored UUID that was successful, then it adds the UUID to the start of array for
         // faster connection.
-        if(data.getUUID() != null && !data.getUUID().equals("")){
+        if(!data.getUUID().isEmpty()){
             this.deviceUUIDS.add(0, UUID.fromString(data.getUUID()));
         }
 
@@ -174,17 +186,15 @@ public class BluetoothService extends Thread {
                     data.storeUUID(uuid.toString());
                     break;
                 } catch (IOException | NullPointerException f) {
-                    f.printStackTrace();
                     close();
                 }
             }
 
-            // Try the fallback Approach if all UUID's don't work.
+            // Try the fallback approach if all UUID's don't work.
             if (!this.isConnected()) {
                 try {
                     tryFallBackConnect(device);
                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException e) {
-                    e.printStackTrace();
                     close();
                 }
             }
@@ -265,7 +275,7 @@ public class BluetoothService extends Thread {
      * @return The bluetooth socket's connected device.
      */
     public BluetoothDevice getRemoteDevice() {
-        return (this.bluetoothSocket == null)? null : this.bluetoothSocket.getRemoteDevice();
+        return (!this.isConnected())? null : this.bluetoothSocket.getRemoteDevice();
     }
 
 
@@ -290,7 +300,7 @@ public class BluetoothService extends Thread {
 
         try {
             Method getUuidsMethod = BluetoothAdapter.class.getDeclaredMethod("getUuids", null);
-            parcelUuids = (ParcelUuid[]) getUuidsMethod.invoke(this.adapter, null);
+            parcelUuids = (ParcelUuid[]) getUuidsMethod.invoke(this.bluetoothAdapter, null);
 
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -310,13 +320,17 @@ public class BluetoothService extends Thread {
      * Closes the bluetooth socket.
      */
     public void close() {
-        if (this.isConnected()) {
-            try {
-                this.bluetoothSocket.close();
-            } catch (IOException | NullPointerException e) {
-                e.printStackTrace();
-            }
+        if(!this.isConnected()){
+            return;
         }
+
+        try {
+            this.bluetoothSocket.close();
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        status = Constants.DISCONNECTED;
 
     }
 
@@ -324,19 +338,19 @@ public class BluetoothService extends Thread {
      * Creates Input and Output stream if the connection to the remote device is successful.
      */
     private void createStreams() {
-        if (this.isConnected()) {
-            try {
-                this.receivingStream = bluetoothSocket.getInputStream();
-                this.sendingStream = bluetoothSocket.getOutputStream();
+        if(!this.isConnected()){
+            return;
+        }
 
-                Log.d(Constants.TAG, "Sockets created");
-            } catch (IOException e) {
-
-                e.printStackTrace();
-                Log.d(Constants.TAG, "Can't create socket streams");
-            }
+        try {
+            this.receivingStream = bluetoothSocket.getInputStream();
+            this.sendingStream = bluetoothSocket.getOutputStream();
+            Log.d(Constants.TAG, "Sockets created");
+        } catch (IOException e) {
+            Log.d(Constants.TAG, "Can't create socket streams");
         }
     }
+
 
 
     /**
@@ -357,12 +371,8 @@ public class BluetoothService extends Thread {
         this.activity = activity;
     }
 
-    public Intent sendBroadcast(String action){
-        if(this.activity.getClass() == MainActivity.class){
-            return new Intent(action);
-        }
-        return null;
+    public void setHandler(Handler handler){
+        this.handler = handler;
     }
-
 
 }

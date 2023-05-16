@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.Data;
-import hkr.wireless.zigbeetleapp.log.MyLog;
+import hkr.wireless.zigbeetleapp.MyLog;
 
 public class Common {
 

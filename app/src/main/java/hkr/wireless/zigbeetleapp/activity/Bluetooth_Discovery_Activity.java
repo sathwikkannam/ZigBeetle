@@ -130,6 +130,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         discoverDevices();
 
         bluetoothService.setActivity(this);
+        bluetoothService.setHandler(null);
     }
 
 
@@ -139,7 +140,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     @Override
     public void onStop() {
         super.onStop();
-        Common.checkBluetoothPermission(activity);
+        Common.checkBluetoothPermission(this);
 
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
@@ -166,10 +167,10 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        Common.checkBluetoothPermission(activity);
+        Common.checkBluetoothPermission(this);
 
         bluetoothAdapter.cancelDiscovery();
-        bluetoothService.connect(bluetoothAdapter.getRemoteDevice(discoveredDevices.get(i).getAddress()));
+        bluetoothService.connect(discoveredDevices.get(i).getAddress());
 
     }
 
@@ -185,7 +186,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
         }
 
         if (enable && !bluetoothAdapter.isEnabled()) {
-            Common.checkBluetoothPermission(activity);
+            Common.checkBluetoothPermission(this);
 
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
 
@@ -201,7 +202,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
      * Makes the devices discoverable.
      */
     public void setDiscoverability() {
-        Common.checkBluetoothPermission(activity);
+        Common.checkBluetoothPermission(this);
 
         if (bluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE));
@@ -214,7 +215,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
      * Starts and stops bluetooth discovery.
      */
     public void discoverDevices() {
-        Common.checkBluetoothPermission(activity);
+        Common.checkBluetoothPermission(this);
 
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
