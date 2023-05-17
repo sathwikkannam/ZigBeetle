@@ -125,7 +125,7 @@ public class BluetoothService extends Thread {
 
     /**
      * This attempts to connect to the remote bluetooth device with either only SPP profile or
-     * try's all UUIDs until a connection is made.
+     * tries all UUIDs until a connection is made.
      *
      * @param mac Address of the remote device.
      */
