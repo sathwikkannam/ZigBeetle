@@ -90,13 +90,4 @@ public class Common {
         }
 
     }
-
-    public static void setActions(ArrayList<String> actions, Activity activity, BroadcastReceiver receiver){
-        IntentFilter intentFilter = new IntentFilter();
-        actions.forEach(intentFilter::addAction);
-        activity.registerReceiver(receiver, intentFilter);
-    }
-
-
-
 }

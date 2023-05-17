@@ -42,8 +42,7 @@ public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
         BluetoothDevice device = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(
-                    resource, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(resource, parent, false);
         }
 
 

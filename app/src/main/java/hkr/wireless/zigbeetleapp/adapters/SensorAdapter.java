@@ -45,8 +45,7 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
         Sensor sensor = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(
-                    resource, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(resource, parent, false);
         }
 
 

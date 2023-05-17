@@ -34,8 +34,7 @@ public class LogsAdapter extends ArrayAdapter<MyLog> {
         MyLog log = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(
-                    resource, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(resource, parent, false);
         }
 
         TextView time = convertView.findViewById(R.id.time);

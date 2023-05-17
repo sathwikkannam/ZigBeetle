@@ -199,7 +199,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
 
 
     /**
-     * Makes the devices discoverable.
+     * Makes the device discoverable.
      */
     public void setDiscoverability() {
         Common.checkBluetoothPermission(this);
@@ -212,7 +212,7 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     }
 
     /**
-     * Starts and stops bluetooth discovery.
+     * Starts bluetooth discovery.
      */
     public void discoverDevices() {
         Common.checkBluetoothPermission(this);
