@@ -28,14 +28,14 @@ import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.Data;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.utils.Common;
-import hkr.wireless.zigbeetleapp.adapters.ViewBluetoothAdapter;
+import hkr.wireless.zigbeetleapp.adapters.BluetoothDevicesAdapter;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
 public class Bluetooth_Discovery_Activity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private ListView listView;
     private BluetoothAdapter bluetoothAdapter;
     private final ArrayList<BluetoothDevice> discoveredDevices = new ArrayList<>();
-    private ViewBluetoothAdapter viewBluetoothAdapter;
+    private BluetoothDevicesAdapter bluetoothDevicesAdapter;
     private LinearLayout toHome, toSettings;
     private Data data;
     private BluetoothService bluetoothService;
@@ -56,8 +56,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                 BluetoothDevice device = intent.getExtras().getParcelable(BluetoothDevice.EXTRA_DEVICE);
 
                 if (!discoveredDevices.contains(device)) {
-                    viewBluetoothAdapter.add(device);
-                    viewBluetoothAdapter.notifyDataSetChanged();
+                    bluetoothDevicesAdapter.add(device);
+                    bluetoothDevicesAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -115,8 +115,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
     public void onStart() {
         super.onStart();
 
-        viewBluetoothAdapter = new ViewBluetoothAdapter(getApplicationContext(), this, R.layout.bluetooth_device_item, discoveredDevices);
-        listView.setAdapter(viewBluetoothAdapter);
+        bluetoothDevicesAdapter = new BluetoothDevicesAdapter(getApplicationContext(), this, R.layout.bluetooth_device_item, discoveredDevices);
+        listView.setAdapter(bluetoothDevicesAdapter);
 
     }
 

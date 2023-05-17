@@ -24,11 +24,11 @@ import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.utils.Common;
 
-public class ViewBluetoothAdapter extends ArrayAdapter<BluetoothDevice> {
+public class BluetoothDevicesAdapter extends ArrayAdapter<BluetoothDevice> {
     private final int resource;
     private final Activity activity;
 
-    public ViewBluetoothAdapter(@NonNull Context context, Activity activity, int resource, @NonNull ArrayList<BluetoothDevice> objects) {
+    public BluetoothDevicesAdapter(@NonNull Context context, Activity activity, int resource, @NonNull ArrayList<BluetoothDevice> objects) {
         super(context, resource, objects);
         this.resource = resource;
         this.activity = activity;
