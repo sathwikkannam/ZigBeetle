@@ -1,5 +1,6 @@
 package hkr.wireless.zigbeetleapp.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +37,7 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
     }
 
 
+    @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.S)
     @NonNull
     @Override
@@ -65,12 +68,29 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
 
 
         name.setText(sensor.getName());
-        status.setText((sensor.getStatus() == Sensor.ON)? "ON" : "OFF");
+
+        if(sensor.getStatus() == Sensor.ON){
+            status.setText("ON");
+            status.setTextColor(ContextCompat.getColor(getContext(), R.color.green));
+        }else{
+            status.setText("OFF");
+        }
+
         panID.setText(Arrays.toString(sensor.getPanID()));
 
 
-        on.setOnClickListener(view -> handler.obtainMessage(Constants.WRITE_MESSAGE, Sensor.ON, 0, sensor));
-        off.setOnClickListener(view -> handler.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensor));
+        on.setOnClickListener(view -> {
+            if(sensor.getStatus() != Sensor.ON){
+                handler.obtainMessage(Constants.WRITE_MESSAGE, Sensor.ON, 0, sensor).sendToTarget();
+            }
+        });
+
+
+        off.setOnClickListener(view -> {
+            if(sensor.getStatus() != Sensor.OFF){
+                handler.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensor).sendToTarget();
+            }
+        });
 
         return convertView;
     }

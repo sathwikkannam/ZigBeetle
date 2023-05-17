@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.os.Message;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
 
+                if(arg == Sensor.ON){
+
+                }else{
+
+                }
                 // Create a ZIGBEE PACKET HERE.
 
             }
@@ -88,11 +95,12 @@ public class MainActivity extends AppCompatActivity {
             -----------------------OBJECTS---------------------
          */
         data = Data.getInstance(this);
+        data.clearSensors();
         bluetoothService = BluetoothService.getInstance(this);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         setMainActivityStatus = new SetMainActivityStatus(status, bluetoothService, this);
         sensors = (data.getSensors() != null && !data.getSensors().isEmpty())? data.getSensors() : createSensors();
-
+        sensorAdapter = new SensorAdapter(this, R.layout.sensor_item, sensors, handler);
 
         toSettings.setOnClickListener(View -> Common.startActivity(this, Settings_Activity.class));
         toBluetooth.setOnClickListener(View -> Common.startActivity(this, Bluetooth_Discovery_Activity.class));
@@ -106,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
         Common.checkBluetoothPermission(this);
 
-        sensorAdapter = new SensorAdapter(this, R.layout.sensor_item, sensors, handler);
         sensorsListView.setAdapter(sensorAdapter);
 
     }
@@ -144,7 +151,8 @@ public class MainActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         data.storeSensors(sensors);
-        setMainActivityStatus.setState(false);
+        setMainActivityStatus.setThreadState(false);
+        bluetoothService.setHandler(null);
     }
 
 
@@ -160,9 +168,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public ArrayList<Sensor> createSensors() {
         return new ArrayList<>(Arrays.asList(
-                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_SENSOR_PAN_ID, "Temperature: "),
-                new Sensor("Fan", Sensor.OFF, Constants.FAN_SENSOR_PAN_ID),
-                new Sensor("Heater", Sensor.OFF, Constants.HEATER_SENSOR_PAN_ID)
+                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_SENSOR_PAN_ID.getBytes(), "Temperature: "),
+                new Sensor("Fan", Sensor.OFF, Constants.FAN_SENSOR_PAN_ID.getBytes()),
+                new Sensor("Heater", Sensor.OFF, Constants.HEATER_SENSOR_PAN_ID.getBytes())
         ));
 
     }

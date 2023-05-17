@@ -22,9 +22,9 @@ public class Constants {
      */
     public static final String ZIGBEE_CONTROLLER_MAC = "00:06:66:4A:67:86";
     public static final String ZIGBEE_CONTROLLER_PIN = "1234";
-    public static final byte[] TEMPERATURE_SENSOR_PAN_ID = "null".getBytes();
-    public static final byte[] FAN_SENSOR_PAN_ID = "null".getBytes();
-    public static final byte[] HEATER_SENSOR_PAN_ID = "null".getBytes();
+    public static final String TEMPERATURE_SENSOR_PAN_ID = "null";
+    public static final String FAN_SENSOR_PAN_ID = "null";
+    public static final String HEATER_SENSOR_PAN_ID = "null";
 
 
     /*

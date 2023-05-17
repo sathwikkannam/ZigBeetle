@@ -54,6 +54,11 @@ public class Data{
         return gson.fromJson(this.reader.getString(Constants.STORE_SENSORS, ""), type);
     }
 
+    public void clearSensors(){
+       this.writer.remove(Constants.STORE_SENSORS).apply();
+    }
+
+
 
     public void storeUUID(String uuid){
         this.writer.putString(Constants.WORKING_UUID, uuid).apply();

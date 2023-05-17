@@ -71,4 +71,5 @@
     <string name="pan_id">PAN ID</string>
     <string name="parameter_value">Additional_value</string>
     <string name="parameter_name">Parameter name:</string>
+    <string name="pan_id1">PAN ID:</string>
 </resources>

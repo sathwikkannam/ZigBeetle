@@ -16,7 +16,7 @@ public class SetMainActivityStatus extends Thread{
     private final BluetoothService bluetoothService;
     private boolean state;
     private final Activity activity;
-    private String previousState;
+    private String previousStatus;
 
     public SetMainActivityStatus(TextView statusView, BluetoothService bluetoothService, Activity activity){
         this.statusView = statusView;
@@ -30,11 +30,11 @@ public class SetMainActivityStatus extends Thread{
     @Override
     public void run(){
         while(state){
-            String state = this.bluetoothService.getStatus();
+            String status = this.bluetoothService.getStatus();
 
-            if(!state.equals(previousState)){
+            if(!status.equals(previousStatus)){
                 activity.runOnUiThread(() ->{
-                    switch (state) {
+                    switch (status) {
                         case Constants.CONNECTED:
                             statusView.setText(String.format("%s %s", "Connected to", Common.getName(bluetoothService.getRemoteDevice())));
                             statusView.setTextColor(ContextCompat.getColor(activity, R.color.green));
@@ -50,11 +50,12 @@ public class SetMainActivityStatus extends Thread{
                         case Constants.NO_DEVICE_FOUND:
                             statusView.setText(Constants.NO_DEVICE_FOUND);
                             statusView.setTextColor(ContextCompat.getColor(activity, R.color.red));
+                            break;
                     }
 
                 });
 
-                previousState = state;
+                previousStatus = status;
             }
 
             try {
@@ -68,7 +69,7 @@ public class SetMainActivityStatus extends Thread{
     }
 
 
-    public void setState(boolean start) {
+    public void setThreadState(boolean start) {
         this.state = start;
     }
 }

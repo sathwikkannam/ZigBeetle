@@ -59,7 +59,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:text="@string/status"
-            android:textColor="@color/platinum"
+            android:textColor="@color/red"
             android:layout_toEndOf="@+id/status_header"
             android:id="@+id/status"
             android:textSize="15sp"
@@ -69,6 +69,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/pan_id1"
+            android:id="@+id/pan_id_header"
+            android:layout_below="@+id/status"
+            android:textSize="15sp"
+            android:textColor="@color/platinum"
+            android:fontFamily="sans-serif-black"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/pan_id_header"
             android:id="@+id/PAN_ID"
             android:text="@string/pan_id"
             android:layout_below="@+id/status"
@@ -131,7 +144,7 @@
                 android:text="@string/turn_on"
                 android:layout_alignParentEnd="true"
                 android:id="@+id/turn_ON"
-                android:backgroundTint="@color/platinum"
+                android:backgroundTint="@color/lightGrey"
                 android:focusable="true" />
 
 
@@ -152,7 +165,7 @@
                 android:text="@string/turn_off"
                 android:id="@+id/turn_OFF"
                 android:layout_below="@id/turn_ON"
-                android:backgroundTint="@color/platinum"
+                android:backgroundTint="@color/lightGrey"
                 android:focusable="true" />
 
         </RelativeLayout>
