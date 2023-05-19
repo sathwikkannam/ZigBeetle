@@ -76,7 +76,7 @@ public class Sensor {
             stringBuilder.append(String.format("%02X ", val));
         }
 
-        return stringBuilder.toString().replace(" ", "");
+        return stringBuilder.toString().replace(" ", "-");
     }
 
 }
