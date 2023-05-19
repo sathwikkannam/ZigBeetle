@@ -40,7 +40,7 @@ public class ZigbeePacket {
         this.packet[13] = this.destination16[0]; // MSB
         this.packet[14] = this.destination16[1]; // LSB
         this.packet[15] = ZigbeeConstants.DEFAULT_BROADCAST_RADIUS;
-        this.packet[16] = (byte) (ZigbeeConstants.DEFAULT_TIMEOUT + ZigbeeConstants.DEFAULT_APS_ENCRYPTION + ZigbeeConstants.DEFAULT_DISABLE_RETIRES);
+        this.packet[16] = (byte) (ZigbeeConstants.DEFAULT_TIMEOUT + ZigbeeConstants.DEFAULT_APS_ENCRYPTION + ZigbeeConstants.DEFAULT_DISABLE_RETRIES);
 
         // Add RF data in big Endian to Packet.
         System.arraycopy(this.msg, 0, this.packet, ZigbeeConstants.RF_DATA_FROM, this.msg.length);
@@ -83,24 +83,19 @@ public class ZigbeePacket {
                 ZigbeeConstants.DEFAULT_FRAME_ID +
                 ZigbeeConstants.DEFAULT_BROADCAST_RADIUS +
                 ZigbeeConstants.DEFAULT_TIMEOUT +
-                ZigbeeConstants.DEFAULT_DISABLE_RETIRES +
+                ZigbeeConstants.DEFAULT_DISABLE_RETRIES +
                 ZigbeeConstants.DEFAULT_APS_ENCRYPTION;
 
-        for (byte item : this.destination16) {
-            sum += item;
+        for(int i = 0; i < Math.max(this.destination64.length, this.msg.length); i++){
+            try{
+                sum += this.destination64[i] + this.msg[i] + this.destination16[i];
+            }catch (NullPointerException | IndexOutOfBoundsException e){
+                continue;
+            }
         }
-
-        for (byte value : this.destination64) {
-            sum += value;
-        }
-
-        for (byte b : this.msg) {
-            sum += b;
-        }
-
 
         // No need to map the value to a byte by (sum & 0xFF), casting it to (byte) works.
-        return (byte) (0xFF - (sum));
+        return (byte) (0xFF - sum);
     }
 
 
