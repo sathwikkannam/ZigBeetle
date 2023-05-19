@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -51,18 +53,20 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
 
         TextView name = convertView.findViewById(R.id.sensor_name);
         TextView status = convertView.findViewById(R.id.status);
-        TextView panID = convertView.findViewById(R.id.PAN_ID);
+        TextView mac = convertView.findViewById(R.id.mac);
         Button on = convertView.findViewById(R.id.turn_ON);
         Button off = convertView.findViewById(R.id.turn_OFF);
         TextView parameterValue = convertView.findViewById(R.id.parameter_value);
         TextView parameterName = convertView.findViewById(R.id.parameter_name);
 
-        if(sensor.getParameterValue() != null && sensor.getParameter() != null){
+        if(sensor.hasParameter()){
             parameterValue.setText(sensor.getParameterValue());
-            parameterName.setText(String.format("%s:", sensor.getParameter()));
+            parameterName.setText(String.format("%s", sensor.getParameter()));
 
             parameterValue.setVisibility(View.VISIBLE);
             parameterName.setVisibility(View.VISIBLE);
+            on.setVisibility(View.GONE);
+            off.setVisibility(View.GONE);
         }
 
 
@@ -75,7 +79,7 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
             status.setText("OFF");
         }
 
-        panID.setText(Arrays.toString(sensor.getPanID()));
+        mac.setText(sensor.macToString());
 
 
         on.setOnClickListener(view -> {

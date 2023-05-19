@@ -30,6 +30,7 @@ import hkr.wireless.zigbeetleapp.Sensor;
 import hkr.wireless.zigbeetleapp.utils.SetMainActivityStatus;
 import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.adapters.SensorAdapter;
+import hkr.wireless.zigbeetleapp.zigbee.ZigbeePacket;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,20 +53,33 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
 
             if (msg.what == Constants.INCOMING_DATA) {
-                byte[] incoming_data = (byte[]) msg.obj;
 
-                //Common.addLog(data, new MyLog(String.format("")));
-                //sensorAdapter.addAll(sensors);
-                //sensorAdapter.notifyDataSetChanged();
+                byte[] incoming_data = (byte[]) msg.obj;
+                Toast.makeText(MainActivity.this, new String(incoming_data), Toast.LENGTH_SHORT).show();
+
+                String rfData = ZigbeePacket.parseRx(incoming_data);
+
+                if(rfData == null){
+                    return;
+                }
+
+                for (int i = 0; i < sensors.size(); i++) {
+                    if(rfData.contains(sensors.get(i).getName())){
+
+                    }
+                }
+
+                Toast.makeText(MainActivity.this, rfData, Toast.LENGTH_SHORT).show();
+                sensorAdapter.notifyDataSetChanged();
             }else if (msg.what == Constants.WRITE_MESSAGE){
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
+                ZigbeePacket zigbeePacket;
+                String state = (arg == Sensor.ON)? "ON" : "OFF";
 
-                if(arg == Sensor.ON){
+                zigbeePacket = new ZigbeePacket(String.format("%s %s", sensor.getName(), state), sensor.getPanID(), sensor.getMac());
+                bluetoothService.send(zigbeePacket.getBytes());
 
-                }else{
-
-                }
                 // Create a ZIGBEE PACKET HERE.
 
             }
@@ -168,9 +182,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public ArrayList<Sensor> createSensors() {
         return new ArrayList<>(Arrays.asList(
-                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_SENSOR_PAN_ID.getBytes(), "Temperature: "),
-                new Sensor("Fan", Sensor.OFF, Constants.FAN_SENSOR_PAN_ID.getBytes()),
-                new Sensor("Heater", Sensor.OFF, Constants.HEATER_SENSOR_PAN_ID.getBytes())
+                new Sensor("Temperature", Sensor.OFF, Constants.PAN_ID, Constants.TEMPERATURE_SENSOR_MAC, "Temperature: "),
+                new Sensor("Fan", Sensor.OFF, Constants.PAN_ID, Constants.FAN_SENSOR_MAC),
+                new Sensor("Heater", Sensor.OFF, Constants.PAN_ID, Constants.HEATER_SENSOR_MAC)
         ));
 
     }
@@ -193,19 +207,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-    public int findSensorByName(String name){
-        AtomicInteger i = new AtomicInteger();
-        i.set(0);
-
-        sensors.forEach(sensor ->{
-            if(sensor.getName().equals(name)){
-                i.set(sensors.indexOf(sensor));
-            }
-        });
-
-        return i.get();
-    }
-
 
 }

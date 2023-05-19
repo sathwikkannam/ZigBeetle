@@ -1,5 +1,7 @@
 package hkr.wireless.zigbeetleapp;
 
+import java.io.CharArrayWriter;
+
 public class Sensor {
     private final String name;
     private final int  status;
@@ -8,22 +10,29 @@ public class Sensor {
     private String parameterValue = null;
     private String parameter = null;
     private final byte[] panID;
+    private final byte[] mac;
 
-
-    public Sensor(String name, int status, byte[] panID){
+    public Sensor(String name, int status, byte[] panID, byte[] mac){
         this.name = name;
         this.status = status;
         this.panID = panID;
+        this.mac = mac;
 
     }
 
-    public Sensor(String name, int status, byte[] panID, String parameter){
+    public Sensor(String name, int status, byte[] panID, byte[] mac, String parameter){
         this.name = name;
         this.status = status;
         this.panID = panID;
         this.parameter = parameter;
+        this.mac = mac;
 
     }
+
+    public byte[] getMac() {
+        return mac;
+    }
+
 
 
     public String getName() {
@@ -55,6 +64,19 @@ public class Sensor {
 
     public void setParameterValue(String parameterValue) {
         this.parameterValue = parameterValue;
+    }
+
+    public boolean hasParameter(){
+        return this.parameter != null;
+    }
+
+    public String macToString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (byte val : this.mac) {
+            stringBuilder.append(String.format("%02X ", val));
+        }
+
+        return stringBuilder.toString().replace(" ", "");
     }
 
 }

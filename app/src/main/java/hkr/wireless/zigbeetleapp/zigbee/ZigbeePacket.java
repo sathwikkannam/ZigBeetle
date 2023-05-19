@@ -50,12 +50,12 @@ public class ZigbeePacket {
 
 
 
-    public byte[] getPacket(){
+    public byte[] getBytes(){
         return this.packet;
     }
 
 
-    public static String parse(byte[] receivedMessage){
+    public static String parseTx(byte[] receivedMessage){
         int length = receivedMessage.length - 1 - ZigbeeConstants.RF_DATA_FROM;
         byte[] msg =  new byte[length + 1];
 
@@ -67,20 +67,40 @@ public class ZigbeePacket {
     }
 
 
+    public static String parseRx(byte[] receivedMessage){
+        return  null;
+    }
 
+
+
+    /**
+     * src: <a href="https://www.digi.com/resources/documentation/Digidocs/90002002/Content/Tasks/t_calculate_checksum.htm?TocPath=API%20Operation%7CAPI%20frame%20format%7C_____1">...</a>
+     * @return Hash sum of packet excluding frame delimiter, and frame length
+     */
     private byte checksum(){
         int sum =
                 ZigbeeConstants.TX_FRAME_TYPE +
                 ZigbeeConstants.DEFAULT_FRAME_ID +
-                this.destination64.length +
-                this.destination16.length +
                 ZigbeeConstants.DEFAULT_BROADCAST_RADIUS +
                 ZigbeeConstants.DEFAULT_TIMEOUT +
                 ZigbeeConstants.DEFAULT_DISABLE_RETIRES +
-                ZigbeeConstants.DEFAULT_APS_ENCRYPTION +
-                this.msg.length;
+                ZigbeeConstants.DEFAULT_APS_ENCRYPTION;
 
-        return (byte) (0xFF - (sum & 0xFF));
+        for (byte item : this.destination16) {
+            sum += item;
+        }
+
+        for (byte value : this.destination64) {
+            sum += value;
+        }
+
+        for (byte b : this.msg) {
+            sum += b;
+        }
+
+
+        // No need to map the value to a byte by (sum & 0xFF), casting it to (byte) works.
+        return (byte) (0xFF - (sum));
     }
 
 

@@ -72,4 +72,6 @@
     <string name="parameter_value">Additional_value</string>
     <string name="parameter_name">Parameter name:</string>
     <string name="pan_id1">PAN ID:</string>
+    <string name="mac">MAC:</string>
+    <string name="temperature">Temperature</string>
 </resources>
