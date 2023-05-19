@@ -35,7 +35,7 @@ public class ZigbeePacket {
 
 
         // Add 64 bit Destination to packet.
-        System.arraycopy(destination64, 0, this.packet, ZigbeeConstants.DESTINATION_64_BYTE_FROM, destination64.length);
+        System.arraycopy(destination64, 0, this.packet, ZigbeeConstants.DESTINATION_64_BYTE_INDEX_FROM, destination64.length);
 
         this.packet[13] = this.destination16[0]; // MSB
         this.packet[14] = this.destination16[1]; // LSB
@@ -43,7 +43,7 @@ public class ZigbeePacket {
         this.packet[16] = (byte) (ZigbeeConstants.DEFAULT_TIMEOUT + ZigbeeConstants.DEFAULT_APS_ENCRYPTION + ZigbeeConstants.DEFAULT_DISABLE_RETRIES);
 
         // Add RF data in big Endian to Packet.
-        System.arraycopy(this.msg, 0, this.packet, ZigbeeConstants.RF_DATA_FROM, this.msg.length);
+        System.arraycopy(this.msg, 0, this.packet, ZigbeeConstants.TX_RF_DATA_INDEX_FROM, this.msg.length);
 
         this.packet[this.packet.length - 1] = this.checksum();
     }
@@ -56,11 +56,11 @@ public class ZigbeePacket {
 
 
     public static String parseTx(byte[] receivedMessage){
-        int length = receivedMessage.length - 1 - ZigbeeConstants.RF_DATA_FROM;
+        int length = receivedMessage.length - 1 - ZigbeeConstants.TX_RF_DATA_INDEX_FROM;
         byte[] msg =  new byte[length + 1];
 
         if (receivedMessage.length - 1 >= 0){
-            System.arraycopy(receivedMessage, ZigbeeConstants.RF_DATA_FROM, msg, 0, receivedMessage.length - 1);
+            System.arraycopy(receivedMessage, ZigbeeConstants.TX_RF_DATA_INDEX_FROM, msg, 0, receivedMessage.length - 1);
         }
 
         return new String(msg);

@@ -4,8 +4,9 @@ public class ZigbeeConstants {
 
     public static byte START_DELIMITER = 0x7E;
     public static byte TX_FRAME_TYPE = 0x01;
-    public static int DESTINATION_64_BYTE_FROM = 5;
-    public static int RF_DATA_FROM = 17;
+    public static int DESTINATION_64_BYTE_INDEX_FROM = 5;
+    public static int TX_RF_DATA_INDEX_FROM = 17;
+    public static int RX_RF_DATA_INDEX_FROM;
     public static int TOTAL_FIELDS_LENGTH = 18;
     public static int FRAME_LENGTH_SIZE = 2;
     public static int FRAME_DATA_LENGTH_WITHOUT_DATA = 14;
