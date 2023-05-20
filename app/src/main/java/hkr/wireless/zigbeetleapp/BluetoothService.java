@@ -87,7 +87,6 @@ public class BluetoothService extends Thread {
             try {
                 this.sendingStream.flush();
                 this.sendingStream.write(msg);
-                Common.addLog(this.data, new MyLog(String.format("%s %s %s %s", "Sent", new String(msg), "to", Common.getName(this.bluetoothSocket.getRemoteDevice()))));
             } catch (IOException e) {
                 e.printStackTrace();
 

@@ -15,7 +15,6 @@ import android.os.Message;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +22,7 @@ import java.util.Arrays;
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.Data;
+import hkr.wireless.zigbeetleapp.MyLog;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.Sensor;
 import hkr.wireless.zigbeetleapp.utils.SetMainActivityStatus;
@@ -46,33 +46,49 @@ public class MainActivity extends AppCompatActivity {
 
 
     // This handler controls sending and receiving data from and to the remote device.
-    private final Handler handler = new Handler(Looper.getMainLooper()){
+    private final Handler BtCommunication = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
+            String log = null;
 
             if (msg.what == Constants.INCOMING_DATA) {
                 RxPacket rxPacket = ZigbeePacket.parse((byte[]) msg.obj);
+                int i = findSensorByMac(rxPacket.getSourceMac());
 
-                if(rxPacket == null){
-                    return;
+                if(Arrays.equals(sensors.get(i).getMac(), Constants.TEMPERATURE_SENSOR_MAC)){
+                    String temperature = rxPacket.getRfData().replace(sensors.get(i).getName() + " ", "");
+                    sensors.get(i).setParameter(temperature);
+                    log = "Temperature is at " + temperature;
+                    sensors.get(i).setStatus(Sensor.ON);
+
+                }else{
+                    boolean status = (rxPacket.getRfData().contains("ON"));
+                    sensors.get(i).setStatus(status ? Sensor.ON : Sensor.OFF);
+                    log = String.format("%s is %s", sensors.get(i).getName(), (status)? "ON" : "OFF");
                 }
 
-
-                Toast.makeText(MainActivity.this, rxPacket.getRfData(), Toast.LENGTH_SHORT).show();
+                sensorAdapter.clear();
+                sensorAdapter.addAll(sensors);
                 sensorAdapter.notifyDataSetChanged();
+
             }else if (msg.what == Constants.WRITE_MESSAGE){
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
                 ZigbeePacket zigbeePacket;
                 String state = (arg == Sensor.ON)? "ON" : "OFF";
-
+                log = String.format("Set %s to %s", sensor.getName(), state);
                 zigbeePacket = new ZigbeePacket(String.format("%s %s", sensor.getName(), state), sensor.getPanID(), sensor.getMac());
                 bluetoothService.send(zigbeePacket.getBytes());
 
                 // Create a ZIGBEE PACKET HERE.
 
             }
+
+            if(log != null){
+                Common.addLog(data, new MyLog(log));
+            }
+
         }
     };
 
@@ -104,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         setMainActivityStatus = new SetMainActivityStatus(status, bluetoothService, this);
         sensors = (data.getSensors() != null && !data.getSensors().isEmpty())? data.getSensors() : createSensors();
-        sensorAdapter = new SensorAdapter(this, R.layout.sensor_item, sensors, handler);
+        sensorAdapter = new SensorAdapter(this, R.layout.sensor_item, sensors, BtCommunication);
 
         toSettings.setOnClickListener(View -> Common.startActivity(this, Settings_Activity.class));
         toBluetooth.setOnClickListener(View -> Common.startActivity(this, Bluetooth_Discovery_Activity.class));
@@ -129,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         bluetoothService.setActivity(this);
-        bluetoothService.setHandler(handler);
+        bluetoothService.setHandler(BtCommunication);
 
         if (!bluetoothService.isConnected() && !data.getMac().isEmpty()) {
 
@@ -196,6 +212,15 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+    public int findSensorByMac(byte[] mac){
+        for (int i = 0; i < sensors.size(); i++) {
+            if(Arrays.equals(sensors.get(i).getMac(), mac)){
+                return i;
+            }
+        }
+
+        return 0;
     }
 
 }

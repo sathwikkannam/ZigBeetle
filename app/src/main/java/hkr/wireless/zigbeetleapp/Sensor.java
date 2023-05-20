@@ -1,10 +1,8 @@
 package hkr.wireless.zigbeetleapp;
 
-import java.io.CharArrayWriter;
-
 public class Sensor {
     private final String name;
-    private final int  status;
+    private int  status;
     public static final int OFF = 1;
     public static final int ON = 0;
     private String parameterValue = null;
@@ -33,7 +31,9 @@ public class Sensor {
         return mac;
     }
 
-
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public String getName() {
         return this.name;
