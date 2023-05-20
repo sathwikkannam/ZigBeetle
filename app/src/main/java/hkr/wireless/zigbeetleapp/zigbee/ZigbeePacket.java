@@ -34,7 +34,7 @@ public class ZigbeePacket {
         this.packet[4] = ZigbeeConstants.DEFAULT_FRAME_ID;
 
 
-        // Add 64 bit Destination to packet.
+        // Add the 64-bit Destination to the packet.
         System.arraycopy(destination64, 0, this.packet, ZigbeeConstants.DESTINATION_64_BYTE_INDEX_FROM, destination64.length);
 
         this.packet[13] = this.destination16[0]; // MSB
@@ -55,20 +55,21 @@ public class ZigbeePacket {
     }
 
 
-    public static String parseTx(byte[] receivedMessage){
-        int length = receivedMessage.length - 1 - ZigbeeConstants.TX_RF_DATA_INDEX_FROM;
-        byte[] msg =  new byte[length + 1];
-
-        if (receivedMessage.length - 1 >= 0){
-            System.arraycopy(receivedMessage, ZigbeeConstants.TX_RF_DATA_INDEX_FROM, msg, 0, receivedMessage.length - 1);
+    public static RxPacket parse(byte[] receivedMessage){
+        if(receivedMessage == null){
+            return  null;
         }
 
-        return new String(msg);
-    }
+        byte[] address = new byte[ZigbeeConstants.ADDRESS_64_SIZE];
+        byte[] text = new byte[receivedMessage.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1];
 
+        System.arraycopy(receivedMessage, ZigbeeConstants.RX_ADDRESS_INDEX_FROM, address, 0, ZigbeeConstants.ADDRESS_64_SIZE);
 
-    public static String parseRx(byte[] receivedMessage){
-        return  null;
+        if (receivedMessage.length - 1 - ZigbeeConstants.RX_ADDRESS_INDEX_FROM >= 0){
+            System.arraycopy(receivedMessage, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, text, 0, receivedMessage.length - 1 - ZigbeeConstants.RX_RF_DATA_INDEX_FROM);
+        }
+
+        return new RxPacket(address, text);
     }
 
 
@@ -86,13 +87,20 @@ public class ZigbeePacket {
                 ZigbeeConstants.DEFAULT_DISABLE_RETRIES +
                 ZigbeeConstants.DEFAULT_APS_ENCRYPTION;
 
-        for(int i = 0; i < Math.max(this.destination64.length, this.msg.length); i++){
-            try{
-                sum += this.destination64[i] + this.msg[i] + this.destination16[i];
-            }catch (NullPointerException | IndexOutOfBoundsException e){
-                continue;
-            }
+
+        for(byte f : this.destination16){
+            sum += f;
         }
+
+        for (byte c : this.destination64){
+            sum += c;
+
+        }
+
+        for(byte g : this.msg){
+            sum += g;
+        }
+
 
         // No need to map the value to a byte by (sum & 0xFF), casting it to (byte) works.
         return (byte) (0xFF - sum);

@@ -6,7 +6,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Constants;
@@ -30,6 +28,7 @@ import hkr.wireless.zigbeetleapp.Sensor;
 import hkr.wireless.zigbeetleapp.utils.SetMainActivityStatus;
 import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.adapters.SensorAdapter;
+import hkr.wireless.zigbeetleapp.zigbee.RxPacket;
 import hkr.wireless.zigbeetleapp.zigbee.ZigbeePacket;
 
 
@@ -53,23 +52,14 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
 
             if (msg.what == Constants.INCOMING_DATA) {
+                RxPacket rxPacket = ZigbeePacket.parse((byte[]) msg.obj);
 
-                byte[] incoming_data = (byte[]) msg.obj;
-                Toast.makeText(MainActivity.this, new String(incoming_data), Toast.LENGTH_SHORT).show();
-
-                String rfData = ZigbeePacket.parseRx(incoming_data);
-
-                if(rfData == null){
+                if(rxPacket == null){
                     return;
                 }
 
-                for (int i = 0; i < sensors.size(); i++) {
-                    if(rfData.contains(sensors.get(i).getName())){
 
-                    }
-                }
-
-                Toast.makeText(MainActivity.this, rfData, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, rxPacket.getRfData(), Toast.LENGTH_SHORT).show();
                 sensorAdapter.notifyDataSetChanged();
             }else if (msg.what == Constants.WRITE_MESSAGE){
                 Sensor sensor = (Sensor) msg.obj;
