@@ -34,7 +34,7 @@ public class Data{
 
 
     public void storeLogs(ArrayList<MyLog> logs){
-        this.writer.putString(Constants.LOGS_LIST, new Gson().toJson(logs)).apply();
+        this.writer.putString(Constants.LOGS_LIST, gson.toJson(logs)).apply();
 
     }
 
@@ -45,7 +45,7 @@ public class Data{
 
 
     public void storeSensors(ArrayList<Sensor> sensors){
-        this.writer.putString(Constants.STORE_SENSORS, new Gson().toJson(sensors)).apply();
+        this.writer.putString(Constants.STORE_SENSORS, gson.toJson(sensors)).apply();
 
     }
 
