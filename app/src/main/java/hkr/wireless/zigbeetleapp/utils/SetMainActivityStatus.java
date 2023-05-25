@@ -50,6 +50,13 @@ public class SetMainActivityStatus extends Thread{
                         case Constants.NO_DEVICE_FOUND:
                             statusView.setText(Constants.NO_DEVICE_FOUND);
                             statusView.setTextColor(ContextCompat.getColor(activity, R.color.red));
+
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException ignored) {
+
+                            }
+
                             break;
                     }
 
