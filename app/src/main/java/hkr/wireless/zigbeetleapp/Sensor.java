@@ -73,10 +73,9 @@ public class Sensor {
     public String macToString(){
         StringBuilder stringBuilder = new StringBuilder();
         for (byte val : this.mac) {
-            stringBuilder.append(String.format("%02X ", val));
+            stringBuilder.append(String.format("-%02X", val));
         }
-
-        return stringBuilder.toString().replace(" ", "-");
+        return stringBuilder.toString().replaceFirst("-", "");
     }
 
 }
