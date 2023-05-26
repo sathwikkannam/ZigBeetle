@@ -2,6 +2,26 @@ package hkr.wireless.zigbeetleapp.zigbee;
 
 public class ZigbeeFrame {
 
+    /**
+     * src: <a href="https://www.digi.com/resources/documentation/Digidocs/90001942-13/reference/r_zigbee_frame_examples.htm?TocPath=XBee%20API%20mode%7C_____4">...</a>
+     * {
+     *      Field           |    Size (bytes)
+     *     ----------------------------------
+     *     START DELIMITER  |   1
+     *     FRAME LENGTH     |   2
+     *     FRAME TYPE       |   1
+     *     FRAME ID         |   1
+     *     DESTINATION 64   |   8
+     *     DESTINATION 16   |   2
+     *     BROADCAST RADIUS |   1
+     *     OPTIONS          |   1
+     *     RF DATA          |   Up to 255 bytes
+     *     CHECKSUM         |   1
+     * }
+     * @param msg RF Data
+     * @param destination64 64-bit address of the remote radio module.
+     * @return A frame
+     */
     public static byte[] build(String msg, byte[] destination64){
         byte[] msgBytes = msg.getBytes();
         byte[] packet = new byte[ZigbeeConstants.TOTAL_FIELDS_LENGTH + msgBytes.length];
