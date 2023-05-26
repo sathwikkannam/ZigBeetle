@@ -54,48 +54,18 @@ public class MainActivity extends AppCompatActivity {
             String log = null;
 
             if (msg.what == Constants.INCOMING_DATA) {
-                byte[] ge = (byte[]) msg.obj;
-
-                StringBuilder e = new StringBuilder();
-                for (int i = 0; i < ge.length; i++) {
-                    e.append(String.format("%02X ", ge[i]));
-                }
-
-                e.append(" Length: " + ge.length);
-                Log.d(Constants.TAG, "Recieved:  " + e.toString());
-                //RxPacket rxPacket = ZigbeePacket.parse((byte[]) msg.obj);
-                //int i = findSensorByMac(rxPacket.getSourceMac());
-
-//                if(Arrays.equals(sensors.get(i).getMac(), Constants.TEMPERATURE_SENSOR_MAC)){
-//                    String temperature = rxPacket.getRfData().replace(sensors.get(i).getName() + " ", "");
-//                    sensors.get(i).setParameterValue(temperature);
-//                    log = "Temperature is at " + temperature;
-//                    sensors.get(i).setStatus(Sensor.ON);
-//
-//                }else{
-//                    boolean status = rxPacket.getRfData().contains("ON");
-//                    sensors.get(i).setStatus(status? Sensor.ON : Sensor.OFF);
-//                    log = String.format("%s is %s", sensors.get(i).getName(), (status)? "ON" : "OFF");
-//                }
-//
-//                sensorAdapter.clear();
-//                sensorAdapter.addAll(sensors);
-//                sensorAdapter.notifyDataSetChanged();
+                byte[] data = (byte[]) msg.obj;
+                Log.d(Constants.TAG, byteToString(data));
 
             } else if (msg.what == Constants.WRITE_MESSAGE){
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
                 ZigbeePacket zigbeePacket;
                 String state = (arg == Sensor.ON)? "ON" : "OFF";
-                zigbeePacket = new ZigbeePacket(String.format("%s %s", sensor.getName(), state), sensor.getDestination16(), sensor.getMac());
-                StringBuilder e = new StringBuilder();
-                for (int i = 0; i < zigbeePacket.getBytes().length; i++) {
-                    e.append(String.format("%02X ", zigbeePacket.getBytes()[i]));
-                }
+                zigbeePacket = new ZigbeePacket(String.format("%s %s", sensor.getName(), state), sensor.getMac());
 
-                e.append(" Length: " + zigbeePacket.getBytes().length);
                 bluetoothService.send(zigbeePacket.getBytes());
-                Log.d(Constants.TAG, e.toString());
+                Log.d(Constants.TAG, byteToString(zigbeePacket.getBytes()));
                 log = String.format("Set %s to %s", sensor.getName(), state);
 
             }
@@ -237,6 +207,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return 0;
+    }
+
+    public String byteToString(byte[] bytes){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte datum : bytes) {
+            stringBuilder.append(String.format("%02X ", datum));
+        }
+        return  stringBuilder.toString();
     }
 
 }
