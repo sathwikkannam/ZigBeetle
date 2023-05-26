@@ -12,8 +12,6 @@ public class ZigbeeFrame {
      *     FRAME TYPE       |   1
      *     FRAME ID         |   1
      *     DESTINATION 64   |   8
-     *     DESTINATION 16   |   2
-     *     BROADCAST RADIUS |   1
      *     OPTIONS          |   1
      *     RF DATA          |   Up to 255 bytes
      *     CHECKSUM         |   1
