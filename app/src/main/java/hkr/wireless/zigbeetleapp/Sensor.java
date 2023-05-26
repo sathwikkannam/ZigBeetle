@@ -7,13 +7,13 @@ public class Sensor {
     public static final int ON = 0;
     private String parameterValue = null;
     private String parameter = null;
-    private final byte[] panID;
+    private final byte[] destination16;
     private final byte[] mac;
 
     public Sensor(String name, int status, byte[] panID, byte[] mac){
         this.name = name;
         this.status = status;
-        this.panID = panID;
+        this.destination16 = panID;
         this.mac = mac;
 
     }
@@ -21,7 +21,7 @@ public class Sensor {
     public Sensor(String name, int status, byte[] panID, byte[] mac, String parameter){
         this.name = name;
         this.status = status;
-        this.panID = panID;
+        this.destination16 = panID;
         this.parameter = parameter;
         this.mac = mac;
 
@@ -53,8 +53,8 @@ public class Sensor {
         this.parameter = parameter;
     }
 
-    public byte[] getPanID() {
-        return this.panID;
+    public byte[] getDestination16() {
+        return this.destination16;
     }
 
 

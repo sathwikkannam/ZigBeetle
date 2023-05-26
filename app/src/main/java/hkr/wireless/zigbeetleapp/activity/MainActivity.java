@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -53,37 +54,52 @@ public class MainActivity extends AppCompatActivity {
             String log = null;
 
             if (msg.what == Constants.INCOMING_DATA) {
-                RxPacket rxPacket = ZigbeePacket.parse((byte[]) msg.obj);
-                int i = findSensorByMac(rxPacket.getSourceMac());
+                byte[] ge = (byte[]) msg.obj;
 
-                if(Arrays.equals(sensors.get(i).getMac(), Constants.TEMPERATURE_SENSOR_MAC)){
-                    String temperature = rxPacket.getRfData().replace(sensors.get(i).getName() + " ", "");
-                    sensors.get(i).setParameter(temperature);
-                    log = "Temperature is at " + temperature;
-                    sensors.get(i).setStatus(Sensor.ON);
-
-                }else{
-                    boolean status = (rxPacket.getRfData().contains("ON"));
-                    sensors.get(i).setStatus(status ? Sensor.ON : Sensor.OFF);
-                    log = String.format("%s is %s", sensors.get(i).getName(), (status)? "ON" : "OFF");
+                StringBuilder e = new StringBuilder();
+                for (int i = 0; i < ge.length; i++) {
+                    e.append(String.format("%02X ", ge[i]));
                 }
 
-                sensorAdapter.clear();
-                sensorAdapter.addAll(sensors);
-                sensorAdapter.notifyDataSetChanged();
+                e.append(" Length: " + ge.length);
+                Log.d(Constants.TAG, "Recieved:  " + e.toString());
+                //RxPacket rxPacket = ZigbeePacket.parse((byte[]) msg.obj);
+                //int i = findSensorByMac(rxPacket.getSourceMac());
 
-            }else if (msg.what == Constants.WRITE_MESSAGE){
+//                if(Arrays.equals(sensors.get(i).getMac(), Constants.TEMPERATURE_SENSOR_MAC)){
+//                    String temperature = rxPacket.getRfData().replace(sensors.get(i).getName() + " ", "");
+//                    sensors.get(i).setParameterValue(temperature);
+//                    log = "Temperature is at " + temperature;
+//                    sensors.get(i).setStatus(Sensor.ON);
+//
+//                }else{
+//                    boolean status = rxPacket.getRfData().contains("ON");
+//                    sensors.get(i).setStatus(status? Sensor.ON : Sensor.OFF);
+//                    log = String.format("%s is %s", sensors.get(i).getName(), (status)? "ON" : "OFF");
+//                }
+//
+//                sensorAdapter.clear();
+//                sensorAdapter.addAll(sensors);
+//                sensorAdapter.notifyDataSetChanged();
+
+            } else if (msg.what == Constants.WRITE_MESSAGE){
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
                 ZigbeePacket zigbeePacket;
                 String state = (arg == Sensor.ON)? "ON" : "OFF";
-                log = String.format("Set %s to %s", sensor.getName(), state);
-                zigbeePacket = new ZigbeePacket(String.format("%s %s", sensor.getName(), state), sensor.getPanID(), sensor.getMac());
-                bluetoothService.send(zigbeePacket.getBytes());
+                zigbeePacket = new ZigbeePacket(String.format("%s %s", sensor.getName(), state), sensor.getDestination16(), sensor.getMac());
+                StringBuilder e = new StringBuilder();
+                for (int i = 0; i < zigbeePacket.getBytes().length; i++) {
+                    e.append(String.format("%02X ", zigbeePacket.getBytes()[i]));
+                }
 
-                // Create a ZIGBEE PACKET HERE.
+                e.append(" Length: " + zigbeePacket.getBytes().length);
+                bluetoothService.send(zigbeePacket.getBytes());
+                Log.d(Constants.TAG, e.toString());
+                log = String.format("Set %s to %s", sensor.getName(), state);
 
             }
+
 
             if(log != null){
                 Common.addLog(data, new MyLog(log));
@@ -188,9 +204,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public ArrayList<Sensor> createSensors() {
         return new ArrayList<>(Arrays.asList(
-                new Sensor("Temperature", Sensor.OFF, Constants.PAN_ID, Constants.TEMPERATURE_SENSOR_MAC, "Temperature: "),
-                new Sensor("Fan", Sensor.OFF, Constants.PAN_ID, Constants.FAN_SENSOR_MAC),
-                new Sensor("Heater", Sensor.OFF, Constants.PAN_ID, Constants.HEATER_SENSOR_MAC)
+                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_DESTINATION_16, Constants.TEMPERATURE_SENSOR_MAC, "Temperature: "),
+                new Sensor("Fan", Sensor.OFF, Constants.FAN_DESTINATION_16, Constants.FAN_SENSOR_MAC),
+                new Sensor("Heater", Sensor.OFF, Constants.HEATER_DESTINATION_16, Constants.HEATER_SENSOR_MAC)
         ));
 
     }

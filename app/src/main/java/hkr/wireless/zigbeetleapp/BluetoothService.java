@@ -35,7 +35,6 @@ public class BluetoothService extends Thread {
     private InputStream receivingStream;
     private OutputStream sendingStream;
     private Activity activity;
-    private final int REQUEST_ENABLE_BT = 1;
     public static BluetoothService bluetoothService;
     private final Data data;
     private final ArrayList<UUID> deviceUUIDS;
@@ -45,7 +44,7 @@ public class BluetoothService extends Thread {
 
     /**
      * Constructor
-     * @param activity Activity
+     * @param activity Activity for sending Toasts.
      */
     @RequiresApi(api = Build.VERSION_CODES.S)
     private BluetoothService(Activity activity) {
@@ -78,7 +77,7 @@ public class BluetoothService extends Thread {
      * @param msg A message to send to the remote device.
      */
     public void send(byte[] msg) {
-        if (this.sendingStream == null) {
+        if (!this.isConnected()) {
             Log.d(Constants.TAG, "Sending Stream in NULL");
             return;
         }
@@ -111,9 +110,7 @@ public class BluetoothService extends Thread {
                     handler.obtainMessage(Constants.INCOMING_DATA,  response).sendToTarget();
                 }
 
-                Thread.sleep(1000);
-
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 Toast.makeText(activity, "Error sending message", Toast.LENGTH_SHORT).show();
             }
 
@@ -157,7 +154,7 @@ public class BluetoothService extends Thread {
 
         // Requires permission to cancel Discovery.
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, Constants.REQUEST_ENABLE_BT);
         }
 
         // Discovery drains battery. Very expensive function.
@@ -231,7 +228,7 @@ public class BluetoothService extends Thread {
     @RequiresApi(api = Build.VERSION_CODES.S)
     private void connectSocket(BluetoothDevice device, UUID uuid) throws IOException {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, Constants.REQUEST_ENABLE_BT);
         }
 
         this.bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
@@ -263,7 +260,7 @@ public class BluetoothService extends Thread {
 
 
     /**
-     * @return If the bluetooth is connected.
+     * @return If the bluetooth socket is connected.
      */
     public boolean isConnected() {
         return this.bluetoothSocket != null && this.bluetoothSocket.isConnected();

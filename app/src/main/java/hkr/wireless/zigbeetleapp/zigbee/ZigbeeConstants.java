@@ -11,7 +11,7 @@ public class ZigbeeConstants {
     public static byte DEFAULT_DISABLE_RETRIES = 0x00;
     public static byte DEFAULT_APS_ENCRYPTION = 0x00;
     public static byte DEFAULT_TIMEOUT = 0x00;
-    public static byte DEFAULT_FRAME_ID = 0x00;
+    public static byte DEFAULT_FRAME_ID = 0x01;
     public static byte DEFAULT_BROADCAST_RADIUS = 0x00;
 
 
