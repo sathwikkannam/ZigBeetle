@@ -3,16 +3,16 @@ package hkr.wireless.zigbeetleapp.zigbee;
 import java.util.Arrays;
 
 public class RxPacket implements Comparable<RxPacket> {
-    private final byte[] sourceMac;
+    private final byte[] source16;
     private final byte[] rfData;
 
     public RxPacket(byte[] source64, byte[] rfData) {
-        this.sourceMac = source64;
+        this.source16 = source64;
         this.rfData = rfData;
     }
 
-    public byte[] getSourceMac() {
-        return this.sourceMac;
+    public byte[] getSource16() {
+        return this.source16;
     }
 
     public String getRfData() {
@@ -23,7 +23,7 @@ public class RxPacket implements Comparable<RxPacket> {
 
     @Override
     public int compareTo(RxPacket rxPacket) {
-        if(Arrays.equals(this.getSourceMac(), rxPacket.getSourceMac()) && this.getRfData().equals(rxPacket.getRfData())){
+        if(Arrays.equals(this.getSource16(), rxPacket.getSource16()) && this.getRfData().equals(rxPacket.getRfData())){
             return  1;
         }
 

@@ -67,8 +67,8 @@ public class Bluetooth_Discovery_Activity extends AppCompatActivity implements A
                 Common.checkBluetoothPermission(activity);
 
                 // Custom pin for the Zigbee controller.
-                if(device.getAddress().equals(Constants.ZIGBEE_CONTROLLER_MAC)){
-                    device.setPin(Constants.ZIGBEE_CONTROLLER_PIN.getBytes());
+                if(device.getAddress().equals(Constants.ZIGBEE_BLUETOOTH_MODULE_MAC)){
+                    device.setPin(Constants.ZIGBEE_BLUETOOTH_MODULE_PIN.getBytes());
                 }
 
             }

@@ -4,9 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -25,7 +23,7 @@ public class Common {
 
     // Maps MAC address to a custom Alias/Name if BluetoothDevice as no name.
     private static final HashMap<String, String> myDevices = new HashMap<String, String>(){{
-       put(Constants.ZIGBEE_CONTROLLER_MAC, "Zigbee Controller");
+       put(Constants.ZIGBEE_BLUETOOTH_MODULE_MAC, "Zigbee bluetooth module");
     }};
 
 
@@ -89,5 +87,15 @@ public class Common {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.BLUETOOTH_ADVERTISE}, Constants.REQUEST_ENABLE_BT);
         }
 
+    }
+
+
+    public static String byteToString(byte[] bytes){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte datum : bytes) {
+            stringBuilder.append(String.format("%02X ", datum));
+        }
+        return  stringBuilder.toString();
     }
 }

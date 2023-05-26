@@ -30,7 +30,8 @@ import hkr.wireless.zigbeetleapp.utils.SetMainActivityStatus;
 import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.adapters.SensorAdapter;
 import hkr.wireless.zigbeetleapp.zigbee.RxPacket;
-import hkr.wireless.zigbeetleapp.zigbee.ZigbeePacket;
+import hkr.wireless.zigbeetleapp.zigbee.ZigbeeConstants;
+import hkr.wireless.zigbeetleapp.zigbee.ZigbeeFrame;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // This handler controls sending and receiving data from and to the remote device.
-    private final Handler BtCommunication = new Handler(Looper.getMainLooper()){
+    private final Handler bluetoothCommunication = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -55,18 +56,29 @@ public class MainActivity extends AppCompatActivity {
 
             if (msg.what == Constants.INCOMING_DATA) {
                 byte[] data = (byte[]) msg.obj;
-                Log.d(Constants.TAG, byteToString(data));
+                Log.d(Constants.TAG, "Raw RX packet: " + Common.byteToString(data));
+                byte frameType;
 
-            } else if (msg.what == Constants.WRITE_MESSAGE){
+                try{
+                    frameType = ZigbeeFrame.getFrameTypeOf(data);
+                }catch (IndexOutOfBoundsException e){
+                    return;
+                }
+
+                if(frameType == ZigbeeConstants.RX_RECEIVE_TYPE_16){
+                    RxPacket rxPacket = ZigbeeFrame.parseRxFrame(data);
+                    Log.d(Constants.TAG, String.format("(0x81 Rx) Received '%s' from %s", rxPacket.getRfData(), Common.byteToString(rxPacket.getSource16())));
+                }
+
+            } else if (msg.what == Constants.WRITE_MESSAGE && bluetoothService.isConnected()){
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
-                ZigbeePacket zigbeePacket;
                 String state = (arg == Sensor.ON)? "ON" : "OFF";
-                zigbeePacket = new ZigbeePacket(String.format("%s %s", sensor.getName(), state), sensor.getMac());
+                byte[] frame = ZigbeeFrame.build(String.format("%s %s", sensor.getName(), state), sensor.getMac());
 
-                bluetoothService.send(zigbeePacket.getBytes());
-                Log.d(Constants.TAG, byteToString(zigbeePacket.getBytes()));
-                log = String.format("Set %s to %s", sensor.getName(), state);
+                bluetoothService.send(frame);
+                Log.d(Constants.TAG, "Raw TX packet: " + Common.byteToString(frame));
+                log = String.format("Request %s to %s", sensor.getName(), state);
 
             }
 
@@ -106,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         setMainActivityStatus = new SetMainActivityStatus(status, bluetoothService, this);
         sensors = (data.getSensors() != null && !data.getSensors().isEmpty())? data.getSensors() : createSensors();
-        sensorAdapter = new SensorAdapter(this, R.layout.sensor_item, sensors, BtCommunication);
+        sensorAdapter = new SensorAdapter(this, R.layout.sensor_item, sensors, bluetoothCommunication);
 
         toSettings.setOnClickListener(View -> Common.startActivity(this, Settings_Activity.class));
         toBluetooth.setOnClickListener(View -> Common.startActivity(this, Bluetooth_Discovery_Activity.class));
@@ -131,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         bluetoothService.setActivity(this);
-        bluetoothService.setHandler(BtCommunication);
+        bluetoothService.setHandler(bluetoothCommunication);
 
         if (!bluetoothService.isConnected() && !data.getMac().isEmpty()) {
 
@@ -174,9 +186,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public ArrayList<Sensor> createSensors() {
         return new ArrayList<>(Arrays.asList(
-                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_DESTINATION_16, Constants.TEMPERATURE_SENSOR_MAC, "Temperature: "),
-                new Sensor("Fan", Sensor.OFF, Constants.FAN_DESTINATION_16, Constants.FAN_SENSOR_MAC),
-                new Sensor("Heater", Sensor.OFF, Constants.HEATER_DESTINATION_16, Constants.HEATER_SENSOR_MAC)
+                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_DES_16, Constants.TEMPERATURE_DES_64, "Temperature: "),
+                new Sensor("Fan", Sensor.OFF, Constants.FAN_DES_16, Constants.FAN_DES_64),
+                new Sensor("Heater", Sensor.OFF, Constants.HEATER_DES_16, Constants.HEATER_DES_64)
         ));
 
     }
@@ -209,13 +221,5 @@ public class MainActivity extends AppCompatActivity {
         return 0;
     }
 
-    public String byteToString(byte[] bytes){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (byte datum : bytes) {
-            stringBuilder.append(String.format("%02X ", datum));
-        }
-        return  stringBuilder.toString();
-    }
 
 }
