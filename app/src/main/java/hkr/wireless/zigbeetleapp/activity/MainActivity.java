@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Constants;
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView status;
     private Data data;
     private SetMainActivityStatus setMainActivityStatus;
-
+    private final ScheduledExecutorService temperatureThread = Executors.newScheduledThreadPool(5);
 
     // This handler controls sending and receiving data from and to the remote device.
     private final Handler bluetoothCommunication = new Handler(Looper.getMainLooper()){
@@ -134,6 +137,14 @@ public class MainActivity extends AppCompatActivity {
 
         sensorsListView.setAdapter(sensorAdapter);
 
+        // Polling the temperature every 1 minute.
+        temperatureThread.scheduleAtFixedRate(() -> {
+            byte[] temperatureFrame = ZigbeeFrame.build("Temperature", Constants.TEMPERATURE_DES_64);
+            bluetoothService.send(temperatureFrame);
+            Log.d(Constants.TAG, "Raw temperature TX packet: " + Common.byteToString(temperatureFrame));
+            Common.addLog(data, new MyLog("Requesting temperature"));
+        }, 0, 1, TimeUnit.MINUTES);
+
     }
 
 
@@ -171,6 +182,10 @@ public class MainActivity extends AppCompatActivity {
         data.storeSensors(sensors);
         setMainActivityStatus.setThreadState(false);
         bluetoothService.setHandler(null);
+
+        if(!temperatureThread.isShutdown()){
+            temperatureThread.shutdown();
+        }
     }
 
 
