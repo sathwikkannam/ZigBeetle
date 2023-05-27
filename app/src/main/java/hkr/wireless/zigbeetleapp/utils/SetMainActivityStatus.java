@@ -2,6 +2,7 @@ package hkr.wireless.zigbeetleapp.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
@@ -53,8 +54,8 @@ public class SetMainActivityStatus extends Thread{
 
                             try {
                                 Thread.sleep(5000);
-                            } catch (InterruptedException ignored) {
-
+                            } catch (InterruptedException e) {
+                                Log.d(Constants.TAG, "Error Thread sleep (5000)");
                             }
 
                             break;
@@ -67,8 +68,8 @@ public class SetMainActivityStatus extends Thread{
 
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException ignored) {
-
+            } catch (InterruptedException e) {
+                Log.d(Constants.TAG, "Error Thread sleep (1000)");
             }
 
         }

@@ -279,10 +279,9 @@ public class BluetoothService extends Thread {
      * @return the state of the connection.
      */
     public String getStatus(){
-        if(this.status.equals(Constants.CONNECTED) && !this.isConnected()){
-            this.status = Constants.DISCONNECTED;
+        if(this.status.equals(Constants.CONNECTED)){
+            this.status = (this.isConnected())? Constants.CONNECTED : Constants.DISCONNECTED;
         }
-
         return this.status;
     }
 
@@ -325,7 +324,7 @@ public class BluetoothService extends Thread {
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
-
+        this.bluetoothSocket = null;
         status = Constants.DISCONNECTED;
 
     }
