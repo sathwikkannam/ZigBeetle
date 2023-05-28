@@ -24,7 +24,9 @@ public class ZigbeeConstants {
     public static int ADDRESS_16_SIZE = 8;
     public static int ADDRESS_16_INDEX_FROM = 4;
     public static int RX_RF_DATA_INDEX_FROM = 8;
-    public static int RX_FRAME_TYPE_INDEX = 4;
+    public static int RX_FRAME_TYPE_INDEX = 3;
     public static byte RX_RECEIVE_TYPE_16 = (byte) 0x81;
+    public static int MAX_PAYLOAD_SIZE = 256;
+    public static int MTU = MAX_PAYLOAD_SIZE + TOTAL_FIELDS_LENGTH;
 
 }

@@ -16,23 +16,28 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
 import hkr.wireless.zigbeetleapp.utils.Common;
+import hkr.wireless.zigbeetleapp.zigbee.ZigbeeConstants;
+import hkr.wireless.zigbeetleapp.zigbee.ZigbeeFrame;
 
 public class BluetoothService extends Thread {
     private final UUID SPP_PROFILE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private final BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket bluetoothSocket;
-    private InputStream receivingStream;
+    public InputStream receivingStream;
     private OutputStream sendingStream;
     private Activity activity;
     public static BluetoothService bluetoothService;
@@ -40,7 +45,6 @@ public class BluetoothService extends Thread {
     private final ArrayList<UUID> deviceUUIDS;
     private String status;
     private Handler handler;
-    private byte[] response;
 
 
     /**
@@ -98,27 +102,35 @@ public class BluetoothService extends Thread {
 
     /**
      * Constantly listens for incoming data in a separate thread.
+     * If the first byte is the start delimiter, then store the frame length specified in the frame.
+     * Then read 'n' number of bytes specified by the frame length
+     * Then read another extra byte for the checksum, since checksum is not included in frame length.
      */
     @Override
     public void run(){
-        this.response = new byte[Constants.ZIGBEE_PACKET_MTU];
-        int sum = 0;
         while (isConnected() && handler != null){
+            int frameLength = 0;
+
             try {
+                byte[] buffer = new byte[ZigbeeConstants.MTU];
+                DataInputStream dataInputStream = new DataInputStream(this.receivingStream);
 
                 synchronized (this){
-                    this.receivingStream.read(response);
+                    if(dataInputStream.readByte() == ZigbeeConstants.START_DELIMITER){
+                        buffer[0] = ZigbeeConstants.START_DELIMITER;
+                        buffer[1] = dataInputStream.readByte();
+                        buffer[2] = dataInputStream.readByte();
+                        frameLength += buffer[1] + buffer[2] + 1;
 
-                    if(!new String(response).isEmpty() && response[0] == 0x7E){
-                        this.join();
-                        handler.obtainMessage(Constants.INCOMING_DATA, this.response).sendToTarget();
-                        response = new byte[Constants.ZIGBEE_PACKET_MTU];
+                        if(frameLength > 1){
+                            dataInputStream.readFully(buffer, 3, frameLength);
+                            byte[] data = Arrays.copyOf(buffer, 3 + frameLength);
+                            handler.obtainMessage(Constants.INCOMING_DATA, data).sendToTarget();
+                        }
+
                     }
-
-
                 }
-
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 Toast.makeText(activity, "Error sending message", Toast.LENGTH_SHORT).show();
             }
         }

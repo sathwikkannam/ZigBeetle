@@ -1,5 +1,7 @@
 package hkr.wireless.zigbeetleapp;
 
+import hkr.wireless.zigbeetleapp.zigbee.ZigbeeConstants;
+
 public class Constants {
     /*
         COMMON USE
@@ -45,7 +47,6 @@ public class Constants {
     public static final String CONNECTED = "Connected";
     public static final String DISCONNECTED = "Disconnected";
     public static final String NO_DEVICE_FOUND = "Can't find device";
-    public static final int ZIGBEE_PACKET_MTU = 1024;
 
 
     /*

@@ -59,19 +59,44 @@ public class MainActivity extends AppCompatActivity {
 
             if (msg.what == Constants.INCOMING_DATA) {
                 byte[] data = (byte[]) msg.obj;
+                int i;
                 Log.d(Constants.TAG, "Raw RX packet: " + Common.byteToString(data));
-                byte frameType;
 
                 try{
-                    frameType = ZigbeeFrame.getFrameTypeOf(data);
+                    if(ZigbeeFrame.getFrameTypeOf(data) != ZigbeeConstants.RX_RECEIVE_TYPE_16){
+                        return;
+                    }
                 }catch (IndexOutOfBoundsException e){
                     return;
                 }
 
-                if(frameType == ZigbeeConstants.RX_RECEIVE_TYPE_16){
-                    RxPacket rxPacket = ZigbeeFrame.parseRxFrame(data);
-                    Log.d(Constants.TAG, String.format("(0x81 Rx) Received '%s' from %s", rxPacket.getRfData(), Common.byteToString(rxPacket.getSource16())));
+                RxPacket rxPacket =  ZigbeeFrame.parseRxFrame(data);
+
+                try{
+                    i = findSensorByAddress(rxPacket.getSource16());
+                }catch (IndexOutOfBoundsException e){
+                    return;
                 }
+
+
+                if(Arrays.equals(sensors.get(i).getDestination16(), Constants.TEMPERATURE_DES_16)){
+                    sensors.get(i).setParameterValue(rxPacket.getRfData());
+                    log = "Temperature is at " + rxPacket.getRfData();
+
+                }else if (rxPacket.getRfData().equals("ON")){
+                    sensors.get(i).setStatus(Sensor.ON);
+                    log = String.format("%s is %s", sensors.get(i).getName(), "ON");
+
+                }else{
+                    sensors.get(i).setStatus(Sensor.OFF);
+                    log = String.format("%s is %s", sensors.get(i).getName(), "OFF");
+                }
+
+                MainActivity.this.runOnUiThread(() -> {
+                    sensorAdapter.clear();
+                    sensorAdapter.addAll(sensors);
+                    sensorAdapter.notifyDataSetChanged();
+                });
 
             } else if (msg.what == Constants.WRITE_MESSAGE && bluetoothService.isConnected()){
                 Sensor sensor = (Sensor) msg.obj;
@@ -81,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
                 bluetoothService.send(frame);
                 Log.d(Constants.TAG, "Raw TX packet: " + Common.byteToString(frame));
-                log = String.format("Request %s to %s", sensor.getName(), state);
+                log = String.format("Request to turn %s %s", state, sensor.getName());
 
             }
 
@@ -116,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
             -----------------------OBJECTS---------------------
          */
         data = Data.getInstance(this);
-        data.clearSensors();
         bluetoothService = BluetoothService.getInstance(this);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         setMainActivityStatus = new SetMainActivityStatus(status, bluetoothService, this);
@@ -186,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothService.setHandler(null);
 
         if(!temperatureThread.isShutdown()){
-            temperatureThread.shutdownNow();
+            temperatureThread.shutdown();
         }
     }
 
@@ -228,14 +252,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-    public int findSensorByMac(byte[] mac){
+    public int findSensorByAddress(byte[] destination16) throws IndexOutOfBoundsException{
         for (int i = 0; i < sensors.size(); i++) {
-            if(Arrays.equals(sensors.get(i).getMac(), mac)){
+            if(Arrays.equals(sensors.get(i).getDestination16(), destination16)){
                 return i;
             }
         }
-
-        return 0;
+        throw new IndexOutOfBoundsException();
     }
 
 
