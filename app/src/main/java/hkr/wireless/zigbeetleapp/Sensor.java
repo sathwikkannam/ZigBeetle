@@ -8,27 +8,27 @@ public class Sensor {
     private String parameterValue = null;
     private String parameter = null;
     private final byte[] destination16;
-    private final byte[] mac;
+    private final byte[] destination64;
 
-    public Sensor(String name, int status, byte[] panID, byte[] mac){
+    public Sensor(String name, int status, byte[] destination16, byte[] destination64){
         this.name = name;
         this.status = status;
-        this.destination16 = panID;
-        this.mac = mac;
+        this.destination16 = destination16;
+        this.destination64 = destination64;
 
     }
 
-    public Sensor(String name, int status, byte[] panID, byte[] mac, String parameter){
+    public Sensor(String name, int status, byte[] destination16, byte[] destination64, String parameter){
         this.name = name;
         this.status = status;
-        this.destination16 = panID;
+        this.destination16 = destination16;
         this.parameter = parameter;
-        this.mac = mac;
+        this.destination64 = destination64;
 
     }
 
-    public byte[] getMac() {
-        return mac;
+    public byte[] getDestination64() {
+        return destination64;
     }
 
     public void setStatus(int status) {
@@ -72,7 +72,7 @@ public class Sensor {
 
     public String macToString(){
         StringBuilder stringBuilder = new StringBuilder();
-        for (byte val : this.mac) {
+        for (byte val : this.destination64) {
             stringBuilder.append(String.format("-%02X", val));
         }
         return stringBuilder.toString().replaceFirst("-", "");

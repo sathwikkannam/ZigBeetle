@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Constants;
@@ -83,13 +82,13 @@ public class MainActivity extends AppCompatActivity {
                     sensors.get(i).setParameterValue(rxPacket.getRfData());
                     log = "Temperature is at " + rxPacket.getRfData();
 
-                }else if (rxPacket.getRfData().equals("ON")){
+                }else if (rxPacket.getRfData().equalsIgnoreCase("On")){
                     sensors.get(i).setStatus(Sensor.ON);
-                    log = String.format("%s is %s", sensors.get(i).getName(), "ON");
+                    log = String.format("%s is %s", sensors.get(i).getName(), "On");
 
                 }else{
                     sensors.get(i).setStatus(Sensor.OFF);
-                    log = String.format("%s is %s", sensors.get(i).getName(), "OFF");
+                    log = String.format("%s is %s", sensors.get(i).getName(), "Off");
                 }
 
                 MainActivity.this.runOnUiThread(() -> {
@@ -101,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (msg.what == Constants.WRITE_MESSAGE && bluetoothService.isConnected()){
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
-                String state = (arg == Sensor.ON)? "ON" : "OFF";
-                byte[] frame = ZigbeeFrame.build(String.format("%s %s", sensor.getName(), state), sensor.getMac());
+                String state = (arg == Sensor.ON)? "On" : "Off";
+                byte[] frame = ZigbeeFrame.build(String.format("%s %s", sensor.getName(), state), sensor.getDestination64());
 
                 bluetoothService.send(frame);
                 Log.d(Constants.TAG, "Raw TX packet: " + Common.byteToString(frame));
