@@ -20,8 +20,6 @@ public class ZigbeeConstants {
 
 
     // RX packet
-    public static int ADDRESS_64_SIZE = 8;
-    public static int ADDRESS_16_SIZE = 8;
     public static int ADDRESS_16_INDEX_FROM = 4;
     public static int RX_RF_DATA_INDEX_FROM = 8;
     public static int RX_FRAME_TYPE_INDEX = 3;
