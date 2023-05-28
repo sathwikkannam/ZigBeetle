@@ -120,7 +120,7 @@ public class BluetoothService extends Thread {
                         buffer[0] = ZigbeeConstants.START_DELIMITER;
                         buffer[1] = dataInputStream.readByte();
                         buffer[2] = dataInputStream.readByte();
-                        frameLength += buffer[1] + buffer[2] + 1;
+                        frameLength += ((buffer[1] & 0xFF) << 8) | (buffer[2] & 0xFF) + 1;
 
                         if(frameLength > 1){
                             dataInputStream.readFully(buffer, 3, frameLength);
