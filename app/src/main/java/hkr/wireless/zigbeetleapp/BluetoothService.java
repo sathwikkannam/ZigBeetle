@@ -40,6 +40,7 @@ public class BluetoothService extends Thread {
     private final ArrayList<UUID> deviceUUIDS;
     private String status;
     private Handler handler;
+    private byte[] response;
 
 
     /**
@@ -100,20 +101,26 @@ public class BluetoothService extends Thread {
      */
     @Override
     public void run(){
-        byte[] response = new byte[Constants.ZIGBEE_PACKET_MTU];
-
+        this.response = new byte[Constants.ZIGBEE_PACKET_MTU];
+        int sum = 0;
         while (isConnected() && handler != null){
             try {
-                this.receivingStream.read(response);
 
-                if(!new String(response).isEmpty()){
-                    handler.obtainMessage(Constants.INCOMING_DATA,  response).sendToTarget();
+                synchronized (this){
+                    this.receivingStream.read(response);
+
+                    if(!new String(response).isEmpty() && response[0] == 0x7E){
+                        this.join();
+                        handler.obtainMessage(Constants.INCOMING_DATA, this.response).sendToTarget();
+                        response = new byte[Constants.ZIGBEE_PACKET_MTU];
+                    }
+
+
                 }
 
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 Toast.makeText(activity, "Error sending message", Toast.LENGTH_SHORT).show();
             }
-
         }
 
     }
