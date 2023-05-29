@@ -74,7 +74,7 @@ public class ZigbeeFrame {
         }
 
         byte[] text = new byte[receivedMessage.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1];
-        byte[] source = new byte[]{receivedMessage[ZigbeeConstants.ADDRESS_16_INDEX_FROM], receivedMessage[++ZigbeeConstants.ADDRESS_16_INDEX_FROM]};
+        byte[] source = new byte[]{receivedMessage[ZigbeeConstants.ADDRESS_16_INDEX_FROM], receivedMessage[ZigbeeConstants.ADDRESS_16_INDEX_FROM + 1]};
         System.arraycopy(receivedMessage, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, text, 0, receivedMessage.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1);
 
         return new RxPacket(source, text);

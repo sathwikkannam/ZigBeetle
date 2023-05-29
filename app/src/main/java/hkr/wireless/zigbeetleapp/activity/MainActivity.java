@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import hkr.wireless.zigbeetleapp.BluetoothService;
 import hkr.wireless.zigbeetleapp.Constants;
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(Arrays.equals(sensors.get(i).getDestination16(), Constants.TEMPERATURE_DES_16)){
                     sensors.get(i).setParameterValue(rxPacket.getRfData());
+                    sensors.get(i).setStatus(Sensor.ON);
                     log = "Temperature is at " + rxPacket.getRfData();
 
                 }else if (rxPacket.getRfData().equalsIgnoreCase("On")){
@@ -92,9 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 MainActivity.this.runOnUiThread(() -> {
-                    sensorAdapter.clear();
-                    sensorAdapter.addAll(sensors);
-                    sensorAdapter.notifyDataSetChanged();
+                    sensorAdapter = new SensorAdapter(MainActivity.this, R.layout.sensor_item, sensors, bluetoothCommunication);
+                    sensorsListView.setAdapter(sensorAdapter);
                 });
 
             } else if (msg.what == Constants.WRITE_MESSAGE && bluetoothService.isConnected()){
@@ -157,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         Common.checkBluetoothPermission(this);
-
         sensorsListView.setAdapter(sensorAdapter);
     }
 
@@ -188,13 +188,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Polling the temperature every 1 minute.
-//        temperatureThread.scheduleAtFixedRate(() -> {
-//            byte[] temperatureFrame = ZigbeeFrame.build("Temperature", Constants.TEMPERATURE_DES_64);
-//            bluetoothService.send(temperatureFrame);
-//            Log.d(Constants.TAG, "Raw temperature TX packet: " + Common.byteToString(temperatureFrame));
-//            Common.addLog(data, new MyLog("Requesting temperature"));
-//
-//        }, 0, Constants.TEMPERATURE_POLLING_DELAY, TimeUnit.MINUTES);
+        temperatureThread.scheduleAtFixedRate(() -> {
+            byte[] temperatureFrame = ZigbeeFrame.build("Temperature", Constants.TEMPERATURE_DES_64);
+            bluetoothService.send(temperatureFrame);
+            Log.d(Constants.TAG, "Raw temperature TX packet: " + Common.byteToString(temperatureFrame));
+            Common.addLog(data, new MyLog("Requesting temperature"));
+
+        }, 0, Constants.TEMPERATURE_POLLING_DELAY, TimeUnit.MINUTES);
 
 
 

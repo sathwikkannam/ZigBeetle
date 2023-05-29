@@ -65,8 +65,8 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
 
             parameterValue.setVisibility(View.VISIBLE);
             parameterName.setVisibility(View.VISIBLE);
-            //on.setVisibility(View.GONE);
-            //off.setVisibility(View.GONE);
+            on.setVisibility(View.GONE);
+            off.setVisibility(View.GONE);
         }
 
 
