@@ -5,16 +5,16 @@ import java.util.Arrays;
 public class RxFrame implements Comparable<RxFrame> {
     private final byte[] source16;
     private final byte[] rfData;
-    private final boolean checksumValid;
+    private final boolean isChecksumValid;
 
-    public RxFrame(byte[] source64, byte[] rfData, boolean checksumValid) {
+    public RxFrame(byte[] source64, byte[] rfData, boolean isChecksumValid) {
         this.source16 = source64;
         this.rfData = rfData;
-        this.checksumValid = checksumValid;
+        this.isChecksumValid = isChecksumValid;
     }
 
     public boolean isChecksumValid() {
-        return checksumValid;
+        return isChecksumValid;
     }
 
     public byte[] getSource16() {
