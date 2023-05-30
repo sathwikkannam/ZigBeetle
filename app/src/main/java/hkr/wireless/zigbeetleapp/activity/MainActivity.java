@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 byte[] frame = ZigbeeFrame.build(String.format("%s %s", sensor.getName(), state), sensor.getDestination64());
 
                 bluetoothService.send(frame);
-                Log.d(Constants.TAG, "Raw TX packet: " + Common.byteToString(frame));
+                Log.d(Constants.TAG, "Raw TX Frame: " + Common.byteToString(frame));
                 log = String.format("Request to turn %s %s", state.toLowerCase(), sensor.getName());
 
             }

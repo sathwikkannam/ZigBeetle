@@ -4,13 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +17,6 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.R;
@@ -29,13 +26,11 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
 
     private final int resource;
     private final Handler handler;
-    private final ArrayList<Sensor> sensors;
 
     public SensorAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Sensor> objects, Handler handler) {
         super(context, resource, objects);
         this.resource = resource;
         this.handler = handler;
-        this.sensors = objects;
     }
 
 
