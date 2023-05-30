@@ -40,7 +40,7 @@ public class MyLog implements Comparable<MyLog>{
     @NonNull
     @Override
     public String toString(){
-        return String.format("%s %s | %s", getDate(), getTime(), getLog());
+        return String.format("%s-%s | %s", getDate(), getTime(), getLog());
     }
 
     @Override
