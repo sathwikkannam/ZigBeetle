@@ -76,7 +76,7 @@ public class ZigbeeFrame {
         byte[] source = new byte[]{receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM], receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM + 1]};
         System.arraycopy(receivedFrame, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, text, 0, receivedFrame.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1);
 
-        return new RxFrame(source, text);
+        return new RxFrame(source, text, checksum(receivedFrame) == receivedFrame[receivedFrame.length - 1]);
     }
 
 
