@@ -24,7 +24,7 @@ public class Constants {
     public static final String ZIGBEE_BLUETOOTH_MODULE_MAC = "00:06:66:4A:67:86";
     public static final String ZIGBEE_BLUETOOTH_MODULE_PIN = "1234";
 
-    // Green:   00-13-A2-00-12-14-B6-C3
+    // Green:   00-13-A2-00-42-14-B6-C3
     // Black:   00-13-A2-00-41-B7-75-70
     // Red:     00-13-A2-00-41-C7-20-68
     // FM :     00-13-A2-00-41-C7-20-1C - Coordinator.
