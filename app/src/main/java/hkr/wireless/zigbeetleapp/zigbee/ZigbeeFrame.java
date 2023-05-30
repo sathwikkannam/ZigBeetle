@@ -64,17 +64,17 @@ public class ZigbeeFrame {
      *     RF DATA          |   Up to 255 bytes
      *     CHECKSUM         |   1
      * }
-     * @param receivedMessage bytes from bluetooth.
+     * @param receivedFrame bytes from bluetooth.
      * @return an RxFrame containing 16-bit source address and RF data.
      */
-    public static RxFrame parseRxFrame(byte[] receivedMessage) {
-        if (receivedMessage == null) {
+    public static RxFrame parseRxFrame(byte[] receivedFrame) {
+        if (receivedFrame == null) {
             return null;
         }
 
-        byte[] text = new byte[receivedMessage.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1];
-        byte[] source = new byte[]{receivedMessage[ZigbeeConstants.ADDRESS_16_INDEX_FROM], receivedMessage[ZigbeeConstants.ADDRESS_16_INDEX_FROM + 1]};
-        System.arraycopy(receivedMessage, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, text, 0, receivedMessage.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1);
+        byte[] text = new byte[receivedFrame.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1];
+        byte[] source = new byte[]{receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM], receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM + 1]};
+        System.arraycopy(receivedFrame, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, text, 0, receivedFrame.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1);
 
         return new RxFrame(source, text);
     }
