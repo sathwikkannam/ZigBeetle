@@ -263,7 +263,7 @@ public class BluetoothService extends Thread {
      * @param device A bluetoothDevice to connect.
      * @throws NoSuchMethodException If the method doesn't even exist.
      * @throws InvocationTargetException
-     * @throws IllegalAccessException The the fallback method is deprecated.
+     * @throws IllegalAccessException
      * @throws IOException If the connection is not successful.
      */
     @SuppressLint("MissingPermission")

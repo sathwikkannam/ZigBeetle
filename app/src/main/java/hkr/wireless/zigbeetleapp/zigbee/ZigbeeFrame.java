@@ -65,7 +65,7 @@ public class ZigbeeFrame {
      *     CHECKSUM         |   1
      * }
      * @param receivedFrame bytes from bluetooth.
-     * @return an ParsedRxFrame containing 16-bit source address and RF data.
+     * @return a ParsedRxFrame containing 16-bit source address and RF data.
      */
     public static ParsedRxFrame parseRxFrame(byte[] receivedFrame) {
         if (receivedFrame == null) {

@@ -189,10 +189,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Polling the temperature every 30 seconds.
         temperatureThread.scheduleAtFixedRate(() -> {
-            byte[] temperatureFrame = ZigbeeFrame.build("Temperature", Constants.TEMPERATURE_DES_64);
-            bluetoothService.send(temperatureFrame);
-            Log.d(Constants.TAG, "Raw temperature TX Frame: " + Common.byteToString(temperatureFrame));
-            Common.addLog(data, new MyLog("Requesting temperature"));
+            if(bluetoothService.isConnected()){
+                byte[] temperatureFrame = ZigbeeFrame.build("Temperature", Constants.TEMPERATURE_DES_64);
+                bluetoothService.send(temperatureFrame);
+                Log.d(Constants.TAG, "Raw temperature TX Frame: " + Common.byteToString(temperatureFrame));
+                Common.addLog(data, new MyLog("Requesting temperature"));
+
+            }
 
         }, 0, Constants.TEMPERATURE_POLLING_DELAY, TimeUnit.SECONDS);
 
