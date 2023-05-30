@@ -19,7 +19,7 @@ public class ZigbeeConstants {
     public static int FRAME_DATA_LENGTH_WITHOUT_DATA = 11;
 
 
-    // RX packet
+    // RX Frame
     public static int ADDRESS_16_INDEX_FROM = 4;
     public static int RX_RF_DATA_INDEX_FROM = 8;
     public static int RX_FRAME_TYPE_INDEX = 3;
