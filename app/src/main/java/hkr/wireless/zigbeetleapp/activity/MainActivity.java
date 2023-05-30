@@ -32,7 +32,7 @@ import hkr.wireless.zigbeetleapp.Sensor;
 import hkr.wireless.zigbeetleapp.utils.SetMainActivityStatus;
 import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.adapters.SensorAdapter;
-import hkr.wireless.zigbeetleapp.zigbee.RxFrame;
+import hkr.wireless.zigbeetleapp.zigbee.ParsedRxFrame;
 import hkr.wireless.zigbeetleapp.zigbee.ZigbeeConstants;
 import hkr.wireless.zigbeetleapp.zigbee.ZigbeeFrame;
 
@@ -70,21 +70,21 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                RxFrame rxFrame =  ZigbeeFrame.parseRxFrame(data);
+                ParsedRxFrame parsedRxFrame =  ZigbeeFrame.parseRxFrame(data);
 
                 try{
-                    i = findSensorByAddress(rxFrame.getSource16());
+                    i = findSensorByAddress(parsedRxFrame.getSource16());
                 }catch (IndexOutOfBoundsException e){
                     return;
                 }
 
 
                 if(Arrays.equals(sensors.get(i).getDestination16(), Constants.TEMPERATURE_DES_16)){
-                    sensors.get(i).setParameterValue(rxFrame.getRfData() + "°C");
+                    sensors.get(i).setParameterValue(parsedRxFrame.getRfData() + "°C");
                     sensors.get(i).setStatus(Sensor.ON);
-                    log = "Temperature is at " + rxFrame.getRfData() + "°C";
+                    log = "Temperature is at " + parsedRxFrame.getRfData() + "°C";
 
-                }else if (rxFrame.getRfData().equalsIgnoreCase("On")){
+                }else if (parsedRxFrame.getRfData().equalsIgnoreCase("On")){
                     sensors.get(i).setStatus(Sensor.ON);
                     log = String.format("%s is %s", sensors.get(i).getName(), "On");
 

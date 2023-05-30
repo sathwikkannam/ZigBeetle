@@ -65,9 +65,9 @@ public class ZigbeeFrame {
      *     CHECKSUM         |   1
      * }
      * @param receivedFrame bytes from bluetooth.
-     * @return an RxFrame containing 16-bit source address and RF data.
+     * @return an ParsedRxFrame containing 16-bit source address and RF data.
      */
-    public static RxFrame parseRxFrame(byte[] receivedFrame) {
+    public static ParsedRxFrame parseRxFrame(byte[] receivedFrame) {
         if (receivedFrame == null) {
             return null;
         }
@@ -76,7 +76,7 @@ public class ZigbeeFrame {
         byte[] source = new byte[]{receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM], receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM + 1]};
         System.arraycopy(receivedFrame, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, text, 0, receivedFrame.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1);
 
-        return new RxFrame(source, text, checksum(receivedFrame) == receivedFrame[receivedFrame.length - 1]);
+        return new ParsedRxFrame(source, text, checksum(receivedFrame) == receivedFrame[receivedFrame.length - 1]);
     }
 
 
