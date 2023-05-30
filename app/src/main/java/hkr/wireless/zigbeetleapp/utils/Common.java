@@ -21,7 +21,7 @@ import hkr.wireless.zigbeetleapp.MyLog;
 
 public class Common {
 
-    // Maps MAC address to a custom Alias/Name if BluetoothDevice as no name.
+    // Maps MAC address to a custom alias if BluetoothDevice has no name.
     private static final HashMap<String, String> myDevices = new HashMap<String, String>(){{
        put(Constants.ZIGBEE_BLUETOOTH_MODULE_MAC, "Zigbee bluetooth module");
     }};
