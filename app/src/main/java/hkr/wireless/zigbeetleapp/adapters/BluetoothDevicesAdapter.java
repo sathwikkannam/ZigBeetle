@@ -54,7 +54,6 @@ public class BluetoothDevicesAdapter extends ArrayAdapter<BluetoothDevice> {
         }
 
         deviceName.setText((Objects.equals(Common.getName(device), device.getAddress()))? "Unknown Name" : Common.getName(device));
-        //deviceName.setText((device.getName() == null)? "Unknown Name": device.getName());
         MAC.setText(device.getAddress());
 
         return convertView;
