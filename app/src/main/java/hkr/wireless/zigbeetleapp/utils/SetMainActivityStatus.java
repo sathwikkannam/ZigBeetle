@@ -77,7 +77,7 @@ public class SetMainActivityStatus extends Thread{
     }
 
 
-    public void setThreadState(boolean start) {
-        this.state = start;
+    public void setThreadState(boolean state) {
+        this.state = state;
     }
 }
