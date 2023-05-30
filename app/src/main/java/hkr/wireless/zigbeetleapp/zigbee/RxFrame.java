@@ -2,11 +2,11 @@ package hkr.wireless.zigbeetleapp.zigbee;
 
 import java.util.Arrays;
 
-public class RxPacket implements Comparable<RxPacket> {
+public class RxFrame implements Comparable<RxFrame> {
     private final byte[] source16;
     private final byte[] rfData;
 
-    public RxPacket(byte[] source64, byte[] rfData) {
+    public RxFrame(byte[] source64, byte[] rfData) {
         this.source16 = source64;
         this.rfData = rfData;
     }
@@ -22,8 +22,8 @@ public class RxPacket implements Comparable<RxPacket> {
 
 
     @Override
-    public int compareTo(RxPacket rxPacket) {
-        if(Arrays.equals(this.getSource16(), rxPacket.getSource16()) && this.getRfData().equals(rxPacket.getRfData())){
+    public int compareTo(RxFrame rxFrame) {
+        if(Arrays.equals(this.getSource16(), rxFrame.getSource16()) && this.getRfData().equals(rxFrame.getRfData())){
             return  1;
         }
 
