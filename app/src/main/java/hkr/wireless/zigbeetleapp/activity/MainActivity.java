@@ -209,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         data.storeSensors(sensors);
         setMainActivityStatus.setThreadState(false);
-        bluetoothService.setHandler(null);
 
         if(!temperatureThread.isShutdown()){
             temperatureThread.shutdown();
