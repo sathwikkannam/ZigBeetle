@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    if(intTemperature < Constants.TEMPERATURE_THRESHOLD){
+                    if(intTemperature <= Constants.TEMPERATURE_THRESHOLD){
                         this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.ON, 0, sensors.get(findSensorByAddress(Constants.HEATER_DES_16))).sendToTarget();
                         this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensors.get(findSensorByAddress(Constants.FAN_DES_16))).sendToTarget();
                     }else{
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 byte[] frame = ZigbeeFrame.build(String.format("%s %s", sensor.getName(), state), sensor.getDestination64());
 
                 bluetoothService.send(frame);
-                Log.d(Constants.TAG, "Raw TX Frame: " + Common.byteToString(frame));
+                Log.d(Constants.TAG, String.format("Raw %s TX Frame: %s", sensor.getName(), Common.byteToString(frame)));
                 log = String.format("Request to turn %s %s", state.toLowerCase(), sensor.getName());
 
             }
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        // Polling the temperature every 30 seconds.
+        // Polling the temperature every 10 seconds.
         temperatureThread.scheduleAtFixedRate(() -> {
             if(bluetoothService.isConnected()){
                 byte[] temperatureFrame = ZigbeeFrame.build("Temperature", Constants.TEMPERATURE_DES_64);
