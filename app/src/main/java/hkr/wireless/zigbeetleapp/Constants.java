@@ -7,7 +7,7 @@ public class Constants {
      */
     public static final String TAG = "ZIGBEE_APP";
     public static final int REQUEST_ENABLE_BT = 1;
-    public static final int TEMPERATURE_POLLING_DELAY = 30;
+    public static final int TEMPERATURE_POLLING_DELAY = 10;
 
     /*
         STORAGE KEYS (SharedPreferences keys)
@@ -38,6 +38,8 @@ public class Constants {
     public static final byte[] COORDINATOR_DES_16 = {(byte) 0x0F, (byte) 0x11};
 
 
+
+    public static final int TEMPERATURE_THRESHOLD = 10;
 
     /*
         BLUETOOTH actions

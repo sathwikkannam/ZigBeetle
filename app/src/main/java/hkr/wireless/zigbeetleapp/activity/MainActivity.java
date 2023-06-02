@@ -80,9 +80,26 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if(Arrays.equals(sensors.get(i).getDestination16(), Constants.TEMPERATURE_DES_16)){
-                    sensors.get(i).setParameterValue(parsedRxFrame.getRfData() + "°C");
+                    String temperature = parsedRxFrame.getRfData().replaceAll(" ","");
+                    int intTemperature = 0;
+                    sensors.get(i).setParameterValue(temperature+ "°C");
                     sensors.get(i).setStatus(Sensor.ON);
-                    log = "Temperature is at " + parsedRxFrame.getRfData() + "°C";
+                    log = "Temperature is at " + temperature + "°C";
+
+
+                    try{
+                        intTemperature = Integer.parseInt(temperature);
+                    }catch (NumberFormatException e){
+                        e.printStackTrace();
+                    }
+
+                    if(intTemperature < Constants.TEMPERATURE_THRESHOLD){
+                        this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.ON, 0, sensors.get(findSensorByAddress(Constants.HEATER_DES_16))).sendToTarget();
+                        this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensors.get(findSensorByAddress(Constants.FAN_DES_16))).sendToTarget();
+                    }else{
+                        this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.ON, 0, sensors.get(findSensorByAddress(Constants.FAN_DES_16))).sendToTarget();
+                        this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensors.get(findSensorByAddress(Constants.HEATER_DES_16))).sendToTarget();
+                    }
 
                 }else if (parsedRxFrame.getRfData().equalsIgnoreCase("On")){
                     sensors.get(i).setStatus(Sensor.ON);
@@ -98,10 +115,16 @@ public class MainActivity extends AppCompatActivity {
                     sensorsListView.setAdapter(sensorAdapter);
                 });
 
-            } else if (msg.what == Constants.WRITE_MESSAGE && bluetoothService.isConnected()){
+            }else if (msg.what == Constants.WRITE_MESSAGE && bluetoothService.isConnected()){
                 Sensor sensor = (Sensor) msg.obj;
                 int arg = msg.arg1; // ON or OFF.
                 String state = (arg == Sensor.ON)? "On" : "Off";
+
+                if(sensor.getStatus() == Sensor.ON && arg == Sensor.ON ||
+                    sensor.getStatus() == Sensor.OFF && arg == Sensor.OFF){
+                    return;
+                }
+
                 byte[] frame = ZigbeeFrame.build(String.format("%s %s", sensor.getName(), state), sensor.getDestination64());
 
                 bluetoothService.send(frame);
