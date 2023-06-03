@@ -127,7 +127,6 @@ public class BluetoothService extends Thread {
                             byte[] data = Arrays.copyOf(buffer, 3 + frameLength);
                             handler.obtainMessage(Constants.INCOMING_DATA, data).sendToTarget();
                         }
-
                     }
                 }
             } catch (IOException e) {

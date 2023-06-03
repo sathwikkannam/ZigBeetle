@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-
                 if(Arrays.equals(sensors.get(i).getDestination16(), Constants.TEMPERATURE_DES_16)){
                     String temperature = parsedRxFrame.getRfData().replaceAll(" ","");
                     int intTemperature = 0;
@@ -101,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                         this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensors.get(findSensorByAddress(Constants.HEATER_DES_16))).sendToTarget();
                     }
 
-                }else if (parsedRxFrame.getRfData().equalsIgnoreCase("On")){
+                }else if (parsedRxFrame.getRfData().toLowerCase().replaceAll(" ", "").contains("on")){
                     sensors.get(i).setStatus(Sensor.ON);
                     log = String.format("%s is %s", sensors.get(i).getName(), "On");
 
