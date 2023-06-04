@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if(Arrays.equals(sensors.get(i).getDestination16(), Constants.TEMPERATURE_DES_16)){
-                    String temperature = parsedRxFrame.getRfData().replaceAll(" ","");
+                    String temperature = parsedRxFrame.getRfData();
                     int intTemperature = 0;
                     sensors.get(i).setParameterValue(temperature+ "°C");
                     sensors.get(i).setStatus(Sensor.ON);
