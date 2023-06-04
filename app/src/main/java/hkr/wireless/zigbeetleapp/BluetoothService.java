@@ -16,7 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
-import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +30,6 @@ import java.util.concurrent.Executors;
 import hkr.wireless.zigbeetleapp.activity.Bluetooth_Discovery_Activity;
 import hkr.wireless.zigbeetleapp.utils.Common;
 import hkr.wireless.zigbeetleapp.zigbee.ZigbeeConstants;
-import hkr.wireless.zigbeetleapp.zigbee.ZigbeeFrame;
 
 public class BluetoothService extends Thread {
     private final UUID SPP_PROFILE = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -56,7 +54,7 @@ public class BluetoothService extends Thread {
         this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         this.activity = activity;
         this.data = Data.getInstance(activity);
-        this.deviceUUIDS = this.getDeviceUUIDS();
+        this.deviceUUIDS = this.getDeviceUuids();
         this.deviceUUIDS.add(SPP_PROFILE);
         this.status = Constants.DISCONNECTED;
     }
@@ -307,7 +305,7 @@ public class BluetoothService extends Thread {
     /**
      * @return A list containing device's UUIDs.
      */
-    private ArrayList<UUID> getDeviceUUIDS() {
+    private ArrayList<UUID> getDeviceUuids() {
         ParcelUuid[] parcelUuids = new ParcelUuid[0];
         ArrayList<UUID> uuids = new ArrayList<>();
 
