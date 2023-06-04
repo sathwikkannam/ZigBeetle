@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                         this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensors.get(findSensorByAddress(Constants.HEATER_DES_16))).sendToTarget();
                     }
 
-                }else if (parsedRxFrame.getRfData().toLowerCase().replaceAll(" ", "").contains("on")){
+                }else if (parsedRxFrame.getRfData().contains("on")){
                     sensors.get(i).setStatus(Sensor.ON);
                     log = String.format("%s is %s", sensors.get(i).getName(), "On");
 

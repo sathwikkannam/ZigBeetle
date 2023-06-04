@@ -22,7 +22,7 @@ public class ParsedRxFrame implements Comparable<ParsedRxFrame> {
     }
 
     public String getRfData() {
-        return new String(this.rfData);
+        return new String(this.rfData).replaceAll(" ", "").toLowerCase();
     }
 
 
