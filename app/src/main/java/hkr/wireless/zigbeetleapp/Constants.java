@@ -7,7 +7,7 @@ public class Constants {
      */
     public static final String TAG = "ZIGBEE_APP";
     public static final int REQUEST_ENABLE_BT = 1;
-    public static final int TEMPERATURE_POLLING_DELAY = 10;
+    public static final int TEMPERATURE_POLLING_DELAY = 30;
 
     /*
         STORAGE KEYS (SharedPreferences keys)
