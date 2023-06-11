@@ -72,11 +72,11 @@ public class ZigbeeFrame {
             return null;
         }
 
-        byte[] text = new byte[receivedFrame.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1];
+        byte[] payload = new byte[receivedFrame.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1];
         byte[] source = new byte[]{receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM], receivedFrame[ZigbeeConstants.ADDRESS_16_INDEX_FROM + 1]};
-        System.arraycopy(receivedFrame, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, text, 0, receivedFrame.length - ZigbeeConstants.RX_RF_DATA_INDEX_FROM - 1);
+        System.arraycopy(receivedFrame, ZigbeeConstants.RX_RF_DATA_INDEX_FROM, payload, 0, payload.length);
 
-        return new ParsedRxFrame(source, text, checksum(receivedFrame) == receivedFrame[receivedFrame.length - 1]);
+        return new ParsedRxFrame(source, payload, checksum(receivedFrame) == receivedFrame[receivedFrame.length - 1]);
     }
 
 
