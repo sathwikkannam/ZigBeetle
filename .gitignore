@@ -17,8 +17,8 @@ local.properties
 
 
 # Tests
-ZigBeetle/app/src/androidTest/
-ZigBeetle/app/src/test/
+app/src/androidTest/
+app/src/test/
 
 
 # Gradle files
