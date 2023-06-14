@@ -31,9 +31,7 @@ public class Common {
     public static String getName(BluetoothDevice device) {
         String deviceName = device.getName();
         String deviceMac = device.getAddress();
-        String myAlias;
-
-        myAlias = myDevices.get(deviceMac);
+        String myAlias = myDevices.get(deviceMac);
 
         if(myAlias != null){
             return myAlias;
