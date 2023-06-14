@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import hkr.wireless.zigbeetleapp.Constants;
 import hkr.wireless.zigbeetleapp.R;
 import hkr.wireless.zigbeetleapp.Sensor;
+import hkr.wireless.zigbeetleapp.utils.Common;
 
 public class SensorAdapter extends ArrayAdapter<Sensor> {
 
@@ -74,7 +75,7 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
             status.setText("OFF");
         }
 
-        mac.setText(sensor.macToString());
+        mac.setText(Common.byteToString(Constants.HEX_STRING_WITH_DASH, sensor.getDestination64()).replaceFirst("-",""));
 
 
         on.setOnClickListener(view -> {

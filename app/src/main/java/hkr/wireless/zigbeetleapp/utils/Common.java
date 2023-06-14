@@ -90,11 +90,11 @@ public class Common {
     }
 
 
-    public static String byteToString(byte[] bytes){
+    public static String byteToString(String format, byte[] bytes){
         StringBuilder stringBuilder = new StringBuilder();
 
         for (byte datum : bytes) {
-            stringBuilder.append(String.format("%02X ", datum));
+            stringBuilder.append(String.format(format, datum));
         }
         return  stringBuilder.toString();
     }

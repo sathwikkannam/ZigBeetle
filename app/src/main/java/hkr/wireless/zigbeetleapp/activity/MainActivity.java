@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             if (msg.what == Constants.INCOMING_DATA) {
                 byte[] data = (byte[]) msg.obj;
                 int i;
-                Log.d(Constants.TAG, "Raw RX Frame: " + Common.byteToString(data));
+                Log.d(Constants.TAG, "Raw RX Frame: " + Common.byteToString(Constants.HEX_STRING, data));
 
                 try{
                     if(ZigbeeFrame.getFrameTypeOf(data) != ZigbeeConstants.RX_RECEIVE_TYPE_16){
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 byte[] frame = ZigbeeFrame.build(String.format("%s %s", sensor.getName(), state), sensor.getDestination64());
 
                 bluetoothService.send(frame);
-                Log.d(Constants.TAG, String.format("Raw %s TX Frame: %s", sensor.getName(), Common.byteToString(frame)));
+                Log.d(Constants.TAG, String.format("Raw %s TX Frame: %s", sensor.getName(), Common.byteToString(Constants.HEX_STRING, frame)));
                 log = String.format("Request to turn %s %s", state.toLowerCase(), sensor.getName());
 
             }
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
             if(bluetoothService.isConnected()){
                 byte[] temperatureFrame = ZigbeeFrame.build("Temperature", Constants.TEMPERATURE_DES_64);
                 bluetoothService.send(temperatureFrame);
-                Log.d(Constants.TAG, "Raw temperature TX Frame: " + Common.byteToString(temperatureFrame));
+                Log.d(Constants.TAG, "Raw temperature TX Frame: " + Common.byteToString(Constants.HEX_STRING, temperatureFrame));
                 Common.addLog(data, new MyLog("Requesting temperature"));
 
             }

@@ -8,6 +8,8 @@ public class Constants {
     public static final String TAG = "ZIGBEE_APP";
     public static final int REQUEST_ENABLE_BT = 1;
     public static final int TEMPERATURE_POLLING_DELAY = 30;
+    public static final String HEX_STRING = "%02X ";
+    public static final String HEX_STRING_WITH_DASH = "-%02X";
 
     /*
         STORAGE KEYS (SharedPreferences keys)

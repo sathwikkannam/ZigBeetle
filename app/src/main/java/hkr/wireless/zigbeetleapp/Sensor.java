@@ -72,14 +72,6 @@ public class Sensor {
         return this.parameter != null;
     }
 
-    public String macToString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        for (byte val : this.destination64) {
-            stringBuilder.append(String.format("-%02X", val));
-        }
-        return stringBuilder.toString().replaceFirst("-", "");
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof byte[]) {
