@@ -37,7 +37,7 @@ public class Common {
             return myAlias;
         }
 
-        if(deviceName == null || deviceName.equals("")){
+        if(deviceName.isEmpty()){
             return deviceMac;
         }
 
