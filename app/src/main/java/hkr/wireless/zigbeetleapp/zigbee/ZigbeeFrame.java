@@ -22,11 +22,11 @@ public class ZigbeeFrame {
     public static byte[] build(String msg, byte[] destination64){
         byte[] msgBytes = msg.getBytes();
         byte[] frame = new byte[ZigbeeConstants.TOTAL_FIELDS_LENGTH + msgBytes.length];
-        int frameLength = ZigbeeConstants.FRAME_DATA_LENGTH_WITHOUT_DATA + msgBytes.length;
+        short frameLength = (short) (ZigbeeConstants.FRAME_DATA_LENGTH_WITHOUT_DATA + msgBytes.length);
 
         frame[0] = ZigbeeConstants.START_DELIMITER;
-        frame[1] = (byte) ((frameLength >> 8) & 0xFF); // MSB
-        frame[2] = (byte) (frameLength & 0xFF); // LSB
+        frame[1] = (byte) (frameLength >> 8); // MSB
+        frame[2] = (byte) frameLength; // LSB
         frame[3] = ZigbeeConstants.TX_FRAME_TYPE_64;
         frame[4] = ZigbeeConstants.DEFAULT_FRAME_ID;
 
@@ -92,7 +92,6 @@ public class ZigbeeFrame {
             sum += frame[i];
         }
 
-        // No need to map the value to a byte by (sum & 0xFF), casting it to (byte) works.
         return (byte) (0xFF - sum);
     }
 

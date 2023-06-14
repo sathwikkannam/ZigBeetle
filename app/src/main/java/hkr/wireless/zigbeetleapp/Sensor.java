@@ -1,5 +1,7 @@
 package hkr.wireless.zigbeetleapp;
 
+import java.util.Arrays;
+
 public class Sensor {
     private final String name;
     private int  status;
@@ -76,6 +78,14 @@ public class Sensor {
             stringBuilder.append(String.format("-%02X", val));
         }
         return stringBuilder.toString().replaceFirst("-", "");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof byte[]) {
+            return (Arrays.equals(this.destination16, (byte[]) obj) || Arrays.equals(this.destination64, (byte[]) obj));
+        }
+        return false;
     }
 
 }
