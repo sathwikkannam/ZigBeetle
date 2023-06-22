@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     try{
-                        sensor.setParameterValue(Integer.parseInt(temperature)+ "°C");
+                        sensor.setParameterValue(Integer.parseInt(temperature));
                     }catch (NumberFormatException e){
                         e.printStackTrace();
                     }

@@ -56,7 +56,7 @@ public class SensorAdapter extends ArrayAdapter<Sensor> {
         TextView parameterName = convertView.findViewById(R.id.parameter_name);
 
         if(sensor.hasParameter()){
-            parameterValue.setText((String) sensor.getParameterValue());
+            parameterValue.setText((String) sensor.getParameterValue() + "°C");
             parameterName.setText(String.format("%s", sensor.getParameter()));
 
             parameterValue.setVisibility(View.VISIBLE);
