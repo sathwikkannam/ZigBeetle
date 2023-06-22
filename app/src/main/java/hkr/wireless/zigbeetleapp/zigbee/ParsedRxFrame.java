@@ -1,8 +1,6 @@
 package hkr.wireless.zigbeetleapp.zigbee;
 
-import java.util.Arrays;
-
-public class ParsedRxFrame implements Comparable<ParsedRxFrame> {
+public class ParsedRxFrame{
     private final byte[] source16;
     private final byte[] rfData;
     private final boolean isChecksumValid;
@@ -25,14 +23,4 @@ public class ParsedRxFrame implements Comparable<ParsedRxFrame> {
         return new String(this.rfData).replaceAll(" ", "").toLowerCase();
     }
 
-
-
-    @Override
-    public int compareTo(ParsedRxFrame parsedRxFrame) {
-        if(Arrays.equals(this.getSource16(), parsedRxFrame.getSource16()) && this.getRfData().equals(parsedRxFrame.getRfData())){
-            return  1;
-        }
-
-        return 0;
-    }
 }

@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
             if (msg.what == Constants.INCOMING_DATA) {
                 byte[] data = (byte[]) msg.obj;
                 int i;
+                Sensor sensor;
                 Log.d(Constants.TAG, "Raw RX Frame: " + Common.byteToString(Constants.HEX_STRING, data));
 
                 try{
@@ -74,25 +75,24 @@ public class MainActivity extends AppCompatActivity {
 
                 try{
                     i = findSensorByAddress(parsedRxFrame.getSource16());
+                    sensor = sensors.get(i);
                 }catch (IndexOutOfBoundsException e){
                     return;
                 }
 
-                if(sensors.get(i).equals(Constants.TEMPERATURE_DES_16)){
+                if(sensor.equals(Constants.TEMPERATURE_DES_16)){
                     String temperature = parsedRxFrame.getRfData();
-                    int intTemperature = 0;
-                    sensors.get(i).setParameterValue(temperature+ "°C");
-                    sensors.get(i).setStatus(Sensor.ON);
+                    sensor.setStatus(Sensor.ON);
                     log = "Temperature is at " + temperature + "°C";
 
 
                     try{
-                        intTemperature = Integer.parseInt(temperature);
+                        sensor.setParameterValue(Integer.parseInt(temperature)+ "°C");
                     }catch (NumberFormatException e){
                         e.printStackTrace();
                     }
 
-                    if(intTemperature <= Constants.TEMPERATURE_THRESHOLD){
+                    if((int) sensor.getParameterValue() <= Constants.TEMPERATURE_THRESHOLD){
                         this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.ON, 0, sensors.get(findSensorByAddress(Constants.HEATER_DES_16))).sendToTarget();
                         this.obtainMessage(Constants.WRITE_MESSAGE, Sensor.OFF, 0, sensors.get(findSensorByAddress(Constants.FAN_DES_16))).sendToTarget();
                     }else{
@@ -101,13 +101,15 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }else if (parsedRxFrame.getRfData().contains("on")){
-                    sensors.get(i).setStatus(Sensor.ON);
-                    log = String.format("%s is %s", sensors.get(i).getName(), "On");
+                    sensor.setStatus(Sensor.ON);
+                    log = String.format("%s is %s", sensor.getName(), "On");
 
                 }else{
-                    sensors.get(i).setStatus(Sensor.OFF);
-                    log = String.format("%s is %s", sensors.get(i).getName(), "Off");
+                    sensor.setStatus(Sensor.OFF);
+                    log = String.format("%s is %s", sensor.getName(), "Off");
                 }
+
+                sensors.add(i, sensor);
 
                 MainActivity.this.runOnUiThread(() -> {
                     sensorAdapter = new SensorAdapter(MainActivity.this, R.layout.sensor_item, sensors, bluetoothCommunication);
@@ -250,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public ArrayList<Sensor> createSensors() {
         return new ArrayList<>(Arrays.asList(
-                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_DES_16, Constants.TEMPERATURE_DES_64, "Temperature: "),
+                new Sensor("Temperature", Sensor.OFF, Constants.TEMPERATURE_DES_16, Constants.TEMPERATURE_DES_64, "Temperature: ", 0),
                 new Sensor("Fan", Sensor.OFF, Constants.FAN_DES_16, Constants.FAN_DES_64),
                 new Sensor("Heater", Sensor.OFF, Constants.HEATER_DES_16, Constants.HEATER_DES_64)
         ));
@@ -275,9 +277,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
     public int findSensorByAddress(byte[] destination16) throws IndexOutOfBoundsException{
         for (int i = 0; i < sensors.size(); i++) {
-            if(Arrays.equals(sensors.get(i).getDestination16(), destination16)){
+            if(sensors.get(i).equals(destination16)){
                 return i;
             }
         }
