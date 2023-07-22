@@ -121,8 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 int arg = msg.arg1; // ON or OFF.
                 String state = (arg == Sensor.ON)? "On" : "Off";
 
-                if(sensor.getStatus() == Sensor.ON && arg == Sensor.ON ||
-                    sensor.getStatus() == Sensor.OFF && arg == Sensor.OFF){
+                if(sensor.getStatus() == arg){
                     return;
                 }
 
